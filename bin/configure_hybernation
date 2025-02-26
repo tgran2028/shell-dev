@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 [enable|disable|status]"
+    exit 1
+fi
+
+get_status() {
+    sudo systemctl status sleep.target suspend.target hibernate.target hybrid-sleep.target | bat -l conf -P --plain -f
+}
+
+case $1 in
+    enable)
+        sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target | bat -l conf -P --plain -f
+        get_status
+        exit 0
+        ;;
+    disable)
+        sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target | bat -l conf -P --plain -f
+        get_status
+        exit 0
+        ;;
+    status)
+        get_status
+        exit 0
+        ;;
+    *)
+        echo "Usage: $0 [enable|disable|status]"
+        exit 1
+        ;;
+esac

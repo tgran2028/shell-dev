@@ -1,0 +1,11 @@
+#!/bin/bash
+
+service_ls() {
+  sudo systemctl list-units --type=service --all | awk '{print $1}' | grep '\.service$' | sort -u
+}
+
+# # if BASH_SOURCE is being executed, call the function
+# if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+#   set -e
+#   service_ls "${@}"
+# fi

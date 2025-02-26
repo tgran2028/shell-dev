@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+export PIPX_HOME=$HOME/.local/python-utils
+export PIPX_BIN_DIR=$HOME/.local/python-utils/bin
+export DOTNET_ROOT=$HOME/.dotnet
+export CARGO_HOME=$HOME/.cargo
+export NVM_DIR=$HOME/.nvm
+export MAMBA_ROOT_PREFIX=$HOME/.local/share/micromamba
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/.local/go
+export GOBIN=$GOPATH/bin
+export PREFIX=$HOME/.local
+export PYENV_ROOT=$HOME/.pyenv
+export RBENV_ROOT=$HOME/.rbenv
+
+path_default() {
+  declare -a paths=(
+    "$HOME/.shell/bin"
+    "$DOTNET_ROOT/tools"
+    "$DOTNET_ROOT"
+    "$HOME/.local/argc-completions/bin"
+    "$CARGO_HOME/bin"
+    "$GOBIN"
+    "$PIPX_BIN_DIR"
+    "$MAMBA_ROOT_PREFIX/condabin"
+    "$PREFIX/share/pnpm"
+    "$NVM_DIR/versions/node/v20.14.0/bin"
+    "$PYENV_ROOT/bin"
+    "$RBENV_ROOT/.rbenv/bin"
+    "$HOME/.script/bin"
+    "$HOME/.yarn/bin"
+    "$PREFIX/bin"
+    /opt/nvim/bin
+    "$GOROOT/bin"
+    /usr/local/bin
+    /usr/local/sbin
+    /usr/local/games
+    /usr/bin
+    /usr/sbin
+    /bin
+    /sbin
+    /usr/games
+    /snap/bin
+  )
+
+  echo "${paths[@]}" |
+    xargs -n1 |
+    xargs -I {} bash -c "[[ -d {} ]] && echo \"\$(realpath -L \"{}\")\"" |
+    grep -v '^$' |
+    uniq -u |
+    tr '\n' ':' |
+    sed -e 's/:$//' -e 's/^://' -e 's/:+/:/'
+}
+
+show_help() {
+  cat << 'EOF' | bat -l help -P --plain -f
+Usage: path-default [options]
+
+Options:
+  -x, --export  Export the PATH variable
+  -n, --no-newline  Do not print a newline at the end
+
+---
+Usage: path-default list [options]
+
+Options:
+  -f, --format  Format the output (list|json|yaml)
+
+---
+
+-h, --help  Display this help and exit
+
+EOF
+  exit 0
+}
+
+
+declare SUBCOMMAND=""
+declare OPT_EXPORT_PATH=false
+declare -l OPT_LIST_FORMAT="list"
+declare OPT_NO_NEWLINE=false
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    -x|--export)
+      OPT_EXPORT_PATH=true
+      shift
+      ;;
+    -n|--no-newline)
+      OPT_NO_NEWLINE=true
+      shift
+      ;;
+    -h|--help)
+      show_help
+      shift
+      ;;
+    ls|list)
+      SUBCOMMAND="list"
+      shift
+      ;;
+    -f|--format)
+      OPT_LIST_FORMAT=$2
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "$SUBCOMMAND" == "list" ]]; then
+  paths=$(path_default | tr ':' '\n' | grep -v '^$')
+  if [[ "$OPT_LIST_FORMAT" == "list" ]]; then
+    echo "$paths"
+  elif [[ "$OPT_LIST_FORMAT" == "json" ]]; then
+    echo "$paths" | jq -R -s 'split("\n")[:-1]' "$@"
+  elif [[ "$OPT_LIST_FORMAT" == "yaml" ]]; then
+    echo "$paths" | jq -R -s 'split("\n")[:-1]' | yq -p json -o y -P "$@"
+  fi
+else
+  NEW_PATH=$(path_default)
+  if [[ "$OPT_EXPORT_PATH" == "true" ]]; then
+    export PATH=$NEW_PATH
+  else
+    if [[ "$OPT_NO_NEWLINE" == "true" ]]; then
+      echo -n "$NEW_PATH"
+    else
+      echo "$NEW_PATH"
+    fi
+  fi
+  unset NEW_PATH
+fi
+
+

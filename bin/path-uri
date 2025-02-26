@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# --------------------------------------------------------
+# path-uri
+# --------------------------------------------------------
+# Convert passed path from stdin to local filesystem URI.
+# --------------------------------------------------------
+
+import sys
+from pathlib import Path
+import re
+
+
+def to_uri(path: str) -> str:
+    """Convert path to local URI."""
+    return (Path(path).expanduser().resolve().as_uri())
+
+
+def trim(value: str) -> str:
+    """Remove leading and trailing whitespace."""
+    return re.sub(r"^\s+|\s+$", "", value)
+
+
+if __name__ == "__main__":
+
+    # check # of args. Print usage if incorrect.
+    if len(sys.argv) != 2:
+        print("Usage: ${Path(__file__).name} <PATH>")
+        sys.exit(1)
+
+    uri = to_uri(trim(sys.argv[1]))
+    print(uri, file=sys.stdout, flush=True)
+    sys.exit(0)

@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Default image viewer (tui).
+
+IFS=\|
+set -f &&
+    set -- $IMAGE_VIEWER_OPTS ${1:+"$@"} &&
+    exec "$IMAGE_VIEWER" "$@"
+
+# vim: set ft=sh :

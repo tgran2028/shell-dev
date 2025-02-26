@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Default terminal emulator window.
+
+IFS=\|
+set -f
+
+if test -f "${XDG_RUNTIME_DIR:?}/DAYLIGHT"; then
+    set -- "$TERMINAL_L" $TERMINAL_L_OPTS ${1:+"$@"}
+else
+    set -- "$TERMINAL_D" $TERMINAL_D_OPTS ${1:+"$@"}
+fi
+
+exec "$@"
+
+# vim: set ft=sh :

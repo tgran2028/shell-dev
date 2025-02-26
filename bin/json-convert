@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Function to parse and validate format options
+parse_format() {
+  local -l fmt=$1
+
+  case "$fmt" in
+    a | auto) echo "auto" ;;
+    y | yaml) echo "yaml" ;;
+    j | json) echo "json" ;;
+    p | props) echo "props" ;;
+    c | csv) echo "csv" ;;
+    x | xml) echo "xml" ;;
+    b | base64) echo "base64" ;;
+    u | uri) echo "uri" ;;
+    t | toml) echo "toml" ;;
+    l | lua) echo "lua" ;;
+    *)
+      echo "Error: Invalid format: '$fmt'. Valid formats are: [auto|yaml|json|props|csv|tsv|xml|base64|uri|toml|lua]" >&2
+      return 1
+      ;;
+  esac
+  return 0
+}
+
+# Default options
+OPT_INPUT_FORMAT="auto"
+OPT_OUTPUT_FORMAT="yaml"
+
+# Use getopt for argument parsing
+# Define options: i: (input format), o: (output format)
+# The ":" indicates that the option requires an argument
+OPTS=$(getopt -o i:o: --long input-format:,output-format: -n 'json-convert' -- "$@")
+
+if [[ $? != 0 ]]; then
+  # getopt found an error
+  echo "Error in command line arguments." >&2
+  exit 1
+fi
+
+# Evaluate the options
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -i | --input-format)
+      if OPT_INPUT_FORMAT=$(parse_format "$2"); then
+        shift 2
+      else
+        exit 1
+      fi
+      ;;
+    -o | --output-format)
+      if OPT_OUTPUT_FORMAT=$(parse_format "$2"); then
+        shift 2
+      else
+        exit 1
+      fi
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      echo "Internal error!" >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Pass remaining arguments to yq
+yq --input-format "$OPT_INPUT_FORMAT" --output-format "$OPT_OUTPUT_FORMAT" "$@"

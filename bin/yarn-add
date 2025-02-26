@@ -1,0 +1,13 @@
+#!/bin/bash
+if [[ $# -eq 1 ]]; then
+    if [[ $1 == 'version' || $1 == '-v' || $1 == '--version' ]]; then
+        yarn --version
+    elif [[ $1 == 'help' || $1 == '-h' || $1 == '--help' ]]; then
+        NO_COLOR='1'
+        yarn help add 2>&1
+    else
+        yarn add "$@"
+    fi
+else
+    yarn add "$@"
+fi

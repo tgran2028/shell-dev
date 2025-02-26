@@ -1,0 +1,48 @@
+#!/bin/bash
+
+##
+# Interactive search script.
+# 
+# This script allows for an interactive search using `fzf` and `rg` (ripgrep).
+# 
+# Usage:
+#   ff            # Run interactive search in the current directory.
+#   ff <folder>   # Run interactive search in the specified folder.
+# 
+# Features:
+# - If a folder is provided as an argument, the script changes to that directory.
+# - Uses `rg` (ripgrep) to search for files and content within files.
+# - `fzf` is used for an interactive selection of files.
+# - Supports multiple file selection with `ctrl-a`.
+# - Allows opening selected files in Sublime Text using `f12`.
+# - Dynamically reloads search results as the query changes.
+# - Provides a preview of the search results with context lines.
+# - Opens the selected files in Sublime Text.
+##
+
+# if -h or --help is passed as an argument, show the help message
+if [[ $1 == "-h" || $1 == "--help" ]]; then
+  echo "Usage: ff [folder]  # Run interactive search in the specified folder."
+  echo "       ff           # Run interactive search in the current directory."
+  exit 0
+fi
+
+# Interactive search.
+# Usage: `ff` or `ff <folder>`.
+[[ -n $1 ]] && cd "$1" # go to provided folder or noop
+RG_DEFAULT_COMMAND="rg -i -l --hidden --no-ignore-vcs"
+
+selected=$(
+FZF_DEFAULT_COMMAND="rg --files" fzf \
+  -m \
+  -e \
+  --ansi \
+  --disabled \
+  --reverse \
+  --bind "ctrl-a:select-all" \
+  --bind "f12:execute-silent:(subl -b {})" \
+  --bind "change:reload:$RG_DEFAULT_COMMAND {q} || true" \
+  --preview "rg -i --pretty --context 2 {q} {}" | cut -d":" -f1,2
+)
+
+[[ -n $selected ]] && subl $selected # open multiple files in editor

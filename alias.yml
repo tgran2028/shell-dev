@@ -1,0 +1,113 @@
+# alias aib='aichat -r bash-command'
+# alias aie='aichat -e '
+# alias ais='NO_COLOR="1" aichat --no-stream --session  --role shell-zsh'
+# alias aish='aichat -r shell '
+# alias apts='apt search'
+# alias at=atuin
+# alias c=clear
+# alias cdh='cd ~'
+# alias ci=code-insiders
+# alias eza='eza --color=auto --icons=auto'
+# alias fds='fd --search-path'
+# alias fsh-alias=fast-theme
+# alias globurl='noglob urlglobber '
+# alias google='web_search google'
+# alias grep='grep --color=auto '
+# alias ls='ls --color=tty'
+# alias mm=micromamba
+# alias mms='micromamba repoquery search '
+# alias nalai='sudo nala install --update'
+# alias nalas='nala search'
+# alias opwk='gzip -dkc ~/.1pw/key.gz'
+# alias pips=pip_search
+# alias reload='exec zsh'
+# alias shfmtg='shfmt -i 2 -ci -sr -kp '
+# alias shfmtgw='shfmt -i 2 -ci -sr -kp -w '
+# alias shfmtw='shfmt -w '
+
+aliases:
+    - name: aib
+      command: aichat -r bash-command
+      type: regular
+    - name: aie
+      command: aichat -e
+      type: regular
+    - name: ais
+      command: NO_COLOR="1" aichat --no-stream --session  --role shell-zsh
+      type: regular
+    - name: aish
+      command: aichat -r shell
+      type: regular
+    - name: apts
+      command: apt search
+      type: regular
+    - name: at
+      command: atuin
+      type: regular
+    - name: c
+      command: clear
+      type: regular
+    - name: cdh
+      command: cd ~
+      type: regular
+    - name: ci
+      command: code-insiders
+      type: regular
+    - name: eza
+      command: eza --color=auto --icons=auto
+      type: regular
+    - name: fds
+      command: fd --search-path
+      type: regular
+    - name: fsh-alias
+      command: fast-theme
+      type: regular
+    - name: globurl
+      command: noglob urlglobber
+      type: regular
+    - name: google
+      command: web_search google
+      type: regular
+    - name: grep
+      command: grep --color=auto
+      type: regular
+    - name: ls
+      command: ls --color=tty
+      type: regular
+    - name: mm
+      command: micromamba
+      type: regular
+    - name: mms
+      command: micromamba repoquery search
+      type: regular
+    - name: nalai
+      command: sudo nala install --update
+      type: regular
+    - name: nalas
+      command: nala search
+      type: regular
+    - name: opwk
+      command: gzip -dkc ~/.1pw/key.gz
+      type: regular
+    - name: pips
+      command: pip_search
+      type: regular
+    - name: reload
+      command: exec zsh
+      type: regular
+    - name: shfmtg
+      command: shfmt -i 2 -ci -sr -kp
+      type: regular
+    - name: shfmtgw
+      command: shfmt -i 2 -ci -sr -kp -w
+      type: regular
+    - name: shfmtw
+      command: shfmt -w
+      type: regular
+
+    - name: --help
+      command: --help 2>&1 | bat --language=help --style=plain -P
+      type: global
+    - name: -h
+      command: -h 2>&1 | bat --language=help --style=plain -P
+      type: global

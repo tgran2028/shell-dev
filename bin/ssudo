@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Use sudo with sdmenu via SUDO_ASKPASS.
+
+exec env SUDO_ASKPASS=${XDG_BIN_HOME:?}/sdmenu sudo -A -- "$@"
+
+# vim: set ft=sh :

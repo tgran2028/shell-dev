@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+# install-deb-from-url
+#
+# @description Basic helper script to install deb package from a URL.
+#
+# @usage install-deb-from-url <url> [GDEBI_OPTS]
+# @arg 1 <url> URL of the deb package to install.
+# @args 2+ (optional) [GDEBI_OPTS] Additional options to pass to gdebi.
+# -----------------------------------------------------------------------------
+
+set -e
+
+#
+# check arguments
+#
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <url> [GDEBI_OPTS]"
+  exit 1
+fi
+
+#
+# ensure gdebi is installed
+#
+if ! command -v gdebi > /dev/null 2>&1; then
+  read -p "gdebi is not installed. Install it now? [y/N] " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Aborting."
+    exit 1
+  fi
+  sudo apt-get update && sudo apt-get install gdebi-core -y
+fi
+
+#
+# parse arguments
+#
+declare URL
+declare DEBFILE_PATH
+declare -a GDEBI_OPTS
+
+for arg in "$@"; do
+  if [ -z "$URL" ]; then
+    URL="$arg"
+  else
+    GDEBI_OPTS+=("$arg")
+  fi
+done
+
+DEBFILE_PATH="${TEMPDIR:-/tmp}/$(basename "$URL")"
+
+#
+# download and install
+#
+echo "Downloading deb file..."
+curl -sSL "$URL" -o "$DEBFILE_PATH"
+trap 'rm -f "$DEBFILE_PATH" > /dev/null 2>&1' EXIT
+sudo gdebi "${GDEBI_OPTS[@]}" "$DEBFILE_PATH"

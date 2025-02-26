@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+exec_zipapp() {
+    /usr/bin/python3 /usr/lib/python3.12/zipapp.py "$@"
+}
+
+# ensure executed script
+if [ "$0" = "$BASH_SOURCE" ]; then
+    if [ $# -eq 0 ]; then
+        # use TERM to determine if to print help in color
+        if [ "$TERM" == 'xterm-256color' ]; then
+            exec_zipapp --help | bat -l help -P --plain -f
+        else
+            exec_zipapp --help
+        fi
+        exit 0
+    else
+        exec_zipapp "$@"
+        exit $?
+    fi
+fi
