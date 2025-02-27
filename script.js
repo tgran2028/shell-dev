@@ -52,6 +52,4 @@ function resolvePromise(promise) {
 };
 
 
-let info = resolvePromise(prettier.getSupportInfo(prettierOptions));
-
 

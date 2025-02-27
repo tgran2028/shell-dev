@@ -143,9 +143,13 @@ dist
 .vscode-test
 
 # yarn v2
+
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-merge-user/
+
+merg-user/
+merg-user
+merg-user/
