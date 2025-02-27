@@ -1,0 +1,192 @@
+################################################################################
+# ---
+# $schema: https://json.schemastore.org/ruff.json
+# prog: ruff
+# file: ruff.toml
+# gist: "01d1427c12fbf30fc6296b24f1b5c8cd"
+# gist_url: https://gist.github.com/tgran2028/01d1427c12fbf30fc6296b24f1b5c8cd
+# repo_url: https://github.com/astral-sh/ruff
+# help_urls:
+#   docs: https://docs.astral.sh/ruff/
+#   rules: https://docs.astral.sh/ruff/rules/
+#   settings: https://docs.astral.sh/ruff/settings/
+# ---
+################################################################################
+
+cache-dir = "~/.cache/ruff"
+
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".ipynb_checkpoints",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pyenv",
+  ".pytest_cache",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  ".vscode",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "site-packages",
+  "venv",
+  ".venv",
+  "env",
+  ".env",
+]
+
+fix = true
+include = ["*.py", "*.pyi", "*.ipynb", "**/pyproject.toml"]
+indent-width = 4
+line-length = 100
+preview = true
+respect-gitignore = true
+
+output-format = "json" # "full" | "concise" | "grouped" | "json" | "junit" | "github" | "gitlab" | "pylint" | "azure"
+
+target-version = "py310"
+
+# The directories to consider when resolving first- vs. third-party imports.
+# https://docs.astral.sh/ruff/settings/#src
+src = ["src", "test"]
+
+
+[format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[lint]
+ignore = [
+  "F401",
+  "F841"
+]
+
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+
+# A regular expression used to identify "dummy" variables, or those which should be ignored when enforcing (e.g.) unused-variable rules. The default expression matches _, __, and _var, but not _var_.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# Require explicit selection of preview rules.
+explicit-preview-rules = true
+
+
+[lint.isort]
+force-to-top = ["src"]
+
+[lint.flake8-import-conventions.aliases]
+altair = "alt"
+holoviews = "hv"
+langchain = "lc"
+matplotlib = "mpl"
+"matplotlib.pyplot" = "plt"
+networkx = "nx"
+numpy = "np"
+pandas = "pd"
+panel = "pn"
+pickle = "pkl"
+"plotly.express" = "px"
+plumbum = "pb"
+polars = "pl"
+pyarrow = "pa"
+pyperclip = "pc"
+seaborn = "sns"
+tensorflow = "tf"
+tkinter = "tk"
+"xml.etree.ElementTree" = "ET"
+
+[lint.flake8-comprehensions]
+allow-dict-calls-with-keyword-arguments = true
+
+[lint.flake8-bugbear]
+# extend-immutable-calls =
+
+[lint.flake8-bandit]
+check-typed-exception = true
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+banned-module-level-imports = []
+
+[lint.flake8-type-checking]
+quote-annotations = false
+strict = false
+
+[lint.flake8-implicit-str-concat]
+allow-multiline = true
+
+[lint.pyupgrade]
+keep-runtime-typing = true
+
+[lint.flake8-self]
+ignore-names = []
+
+[lint.flake8-gettext]
+function-names = []
+
+extend-function-names = []
+
+[lint.flake8-annotations]
+ignore-fully-untyped = false
+
+[lint.mccabe]
+max-complexity = 10
+
+[analyze]
+# Whether to detect imports from string literals. When enabled, Ruff will search for string literals that "look like" import paths, and include them in the import map, if they resolve to valid Python modules.
+detect-string-imports = true
+# Whether to generate a map from file to files that it depends on (dependencies) or files that depend on it (dependents).
+direction = "Dependencies"
+# A list of file patterns to exclude from analysis in addition to the files excluded globally (see exclude, and extend-exclude).
+exclude = ["generated"]
+preview = true
+
+# # include-dependencies = {  }
+
+[lint.pydocstyle]
+convention = "google"
+ignore-var-parameters = true
+
+[lint.pycodestyle]
+ignore-overlong-task-comments = true
+max-line-length = 100
+
+[lint.ruff]
+parenthesize-tuple-in-subscript = true

@@ -20,6 +20,9 @@ ignores:
   - assets
   - tests
   - tools
+  - node_modules
+  - .git
+  
 
 # Use a plugin to recognize math
 # markdownItPlugins:
