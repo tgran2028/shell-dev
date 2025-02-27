@@ -112,27 +112,27 @@ printc() {
 }
 printc_init() {
   case "$1" in
-  true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
-  false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
-  "[DEFINE]") {
-    _PRINTC_PATTERN_ANSI=""
-    _PRINTC_PATTERN_PLAIN=""
-    local name
-    local ansi
-    while read -r name ansi; do
-      if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
-        continue
+    true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
+    false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
+    "[DEFINE]") {
+      _PRINTC_PATTERN_ANSI=""
+      _PRINTC_PATTERN_PLAIN=""
+      local name
+      local ansi
+      while read -r name ansi; do
+        if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
+          continue
+        fi
+        ansi="${ansi/\\/\\\\}"
+        _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
+        _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
+      done
+      if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
+      else
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
       fi
-      ansi="${ansi/\\/\\\\}"
-      _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
-      _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
-    done
-    if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
-    else
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
-    fi
-  } ;;
+    } ;;
   esac
 }
 print_warning() {
@@ -193,29 +193,29 @@ shiftopt() {
   fi
   if [[ $OPT =~ ^-[^-]{2,} ]]; then
     case "$SHIFTOPT_SHORT_OPTIONS" in
-    PASS) _shiftopt_next ;;
-    CONV)
-      OPT="-$OPT"
-      _shiftopt_next
-      ;;
-    VALUE) {
-      OPT="${_ARGV[$_ARGV_INDEX]}"
-      OPT_VAL="${OPT:2}"
-      OPT="${OPT:0:2}"
-      _shiftopt_next
-    } ;;
-    SPLIT) {
-      OPT="-${OPT:_ARGV_SUBINDEX:1}"
-      ((_ARGV_SUBINDEX++)) || true
-      if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+      PASS) _shiftopt_next ;;
+      CONV)
+        OPT="-$OPT"
         _shiftopt_next
-      fi
-    } ;;
-    *)
-      printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
-        "$SHIFTOPT_SHORT_OPTIONS" 1>&2
-      _shiftopt_next
-      ;;
+        ;;
+      VALUE) {
+        OPT="${_ARGV[$_ARGV_INDEX]}"
+        OPT_VAL="${OPT:2}"
+        OPT="${OPT:0:2}"
+        _shiftopt_next
+      } ;;
+      SPLIT) {
+        OPT="-${OPT:_ARGV_SUBINDEX:1}"
+        ((_ARGV_SUBINDEX++)) || true
+        if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+          _shiftopt_next
+        fi
+      } ;;
+      *)
+        printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
+          "$SHIFTOPT_SHORT_OPTIONS" 1>&2
+        _shiftopt_next
+        ;;
     esac
   else
     _shiftopt_next
@@ -252,20 +252,20 @@ hook_color() {
   SHIFTOPT_HOOKS+=("__shiftopt_hook__color")
   __shiftopt_hook__color() {
     case "$OPT" in
-    --no-color) OPT_COLOR=false ;;
-    --color) {
-      case "$OPT_VAL" in
-      "") OPT_COLOR=true ;;
-      always | true) OPT_COLOR=true ;;
-      never | false) OPT_COLOR=false ;;
-      auto) return 0 ;;
-      *)
-        printc "%{RED}%s: '--color' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batman"
-        exit 1
-        ;;
-      esac
-    } ;;
-    *) return 1 ;;
+      --no-color) OPT_COLOR=false ;;
+      --color) {
+        case "$OPT_VAL" in
+          "") OPT_COLOR=true ;;
+          always | true) OPT_COLOR=true ;;
+          never | false) OPT_COLOR=false ;;
+          auto) return 0 ;;
+          *)
+            printc "%{RED}%s: '--color' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batman"
+            exit 1
+            ;;
+        esac
+      } ;;
+      *) return 1 ;;
     esac
     printc_init "$OPT_COLOR"
     return 0
@@ -308,13 +308,13 @@ OPT_EXPORT_ENV=false
 SHIFTOPT_SHORT_OPTIONS="SPLIT"
 while shiftopt; do
   case "$OPT" in
-  --export-env) OPT_EXPORT_ENV=true ;;
-  --paging | --pager | --wrap)
-    shiftval
-    FORWARDED_ARGS+=("${OPT}=${OPT_VAL}")
-    BAT_ARGS+=("${OPT}=${OPT_VAL}")
-    ;;
-  *) MAN_ARGS+=("$OPT") ;;
+    --export-env) OPT_EXPORT_ENV=true ;;
+    --paging | --pager | --wrap)
+      shiftval
+      FORWARDED_ARGS+=("${OPT}=${OPT_VAL}")
+      BAT_ARGS+=("${OPT}=${OPT_VAL}")
+      ;;
+    *) MAN_ARGS+=("$OPT") ;;
   esac
 done
 

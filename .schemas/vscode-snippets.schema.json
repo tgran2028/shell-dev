@@ -50,8 +50,6 @@
       }
     },
     "additionalProperties": false,
-    "required": [
-      "body"
-    ]
+    "required": ["body"]
   }
 }

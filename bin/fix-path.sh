@@ -73,7 +73,7 @@ declare -l USE_SHELL
 
 if [[ $# -eq 1 ]]; then
   USE_SHELL="$1"
-else 
+else
   USE_SHELL=$(ps -p $$ -o comm=)
 fi
 
@@ -90,7 +90,6 @@ fi
 
 log::debug "Shell: $(ps -p $$ -o comm=)"
 log::debug "Exclude terms: ${EXCLUDE_TERMS[*]}"
-
 
 # Helper function to check whether an element exists in an array.
 array_contains() {

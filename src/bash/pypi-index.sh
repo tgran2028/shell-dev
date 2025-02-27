@@ -4,23 +4,23 @@ index_path=~/.cache/pypi.simple-index.json
 
 save_index() {
 
-  curl -fsSL 'https://pypi.org/simple/' | htmlq a -t |
-    {
+  curl -fsSL 'https://pypi.org/simple/' | htmlq a -t \
+    | {
       # remove leading/trailing whitespace
-      sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' |
-
+      sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+        |
         # remove empty lines
-        grep -v '^$' |
-
+        grep -v '^$' \
+        |
         # unique
-        sort -u |
-
+        sort -u \
+        |
         # convert to json
         jq -R -s -M -c \
           --arg timestamp "$(date +%s)" \
           --arg host 'pypi.org' \
-          '{host: $host, last_update: $timestamp | tonumber, packages: split("\n") | map(select(length > 0))}' |
-
+          '{host: $host, last_update: $timestamp | tonumber, packages: split("\n") | map(select(length > 0))}' \
+        |
         # output
         tee "$index_path" > /dev/null
     }
@@ -90,11 +90,11 @@ pypi_get_pkg_data_from_api() {
   local url="https://pypi.org/pypi/${pkg}/json"
   {
     # GET /pypi/{pkg}/json HTTP/1.1
-    curl -fsSL "$url" -H 'Accept: application/json' -H 'Host: pypi.org' |
-
+    curl -fsSL "$url" -H 'Accept: application/json' -H 'Host: pypi.org' \
+      |
       # pretty print JSON
-      jq -M '.' |
-
+      jq -M '.' \
+      |
       # page with bat
       bat -l json --plain --file-name "$pkg.json" --pager 'less -RF'
   }
@@ -131,14 +131,14 @@ pypi_get_pkg_data() {
   curl "$url" \
     -H 'Accept: application/json' \
     -H 'Host: pypi.org' \
-    -fsS |
-    jq -cM \
+    -fsS \
+    | jq -cM \
       --arg timestamp "$(date +%s)" \
       --arg name "$pkg" \
       --arg url "$url" \
-      '{name: $name, url: $url, last_update: $timestamp | tonumber, data: .info }' |
-    tee "$cache_file" |
-    jq '.data'
+      '{name: $name, url: $url, last_update: $timestamp | tonumber, data: .info }' \
+    | tee "$cache_file" \
+    | jq '.data'
 }
 
 pypi_fuzzy_search() {
@@ -168,11 +168,9 @@ main() {
   pypi_fuzzy_search "$@"
 }
 
-
 if [[ "/home/tim/.shell/pypi-index.sh" == "$0" ]]; then
   main "$@"
 fi
-
 
 #   runtime_shell=$(ps -p $$ -o comm=)
 #   if [[ $runtime_shell == "bash" ]]; then
@@ -205,4 +203,3 @@ fi
 # alias pypi-ls=pypi_ls_pkgs
 # alias pypi-get=pypi_get_pkg_data_from_api
 # alias pypi-search=pypi_fuzzy_search
-

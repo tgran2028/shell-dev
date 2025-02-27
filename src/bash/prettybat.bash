@@ -45,29 +45,29 @@ shiftopt() {
   fi
   if [[ $OPT =~ ^-[^-]{2,} ]]; then
     case "$SHIFTOPT_SHORT_OPTIONS" in
-    PASS) _shiftopt_next ;;
-    CONV)
-      OPT="-$OPT"
-      _shiftopt_next
-      ;;
-    VALUE) {
-      OPT="${_ARGV[$_ARGV_INDEX]}"
-      OPT_VAL="${OPT:2}"
-      OPT="${OPT:0:2}"
-      _shiftopt_next
-    } ;;
-    SPLIT) {
-      OPT="-${OPT:_ARGV_SUBINDEX:1}"
-      ((_ARGV_SUBINDEX++)) || true
-      if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+      PASS) _shiftopt_next ;;
+      CONV)
+        OPT="-$OPT"
         _shiftopt_next
-      fi
-    } ;;
-    *)
-      printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
-        "$SHIFTOPT_SHORT_OPTIONS" 1>&2
-      _shiftopt_next
-      ;;
+        ;;
+      VALUE) {
+        OPT="${_ARGV[$_ARGV_INDEX]}"
+        OPT_VAL="${OPT:2}"
+        OPT="${OPT:0:2}"
+        _shiftopt_next
+      } ;;
+      SPLIT) {
+        OPT="-${OPT:_ARGV_SUBINDEX:1}"
+        ((_ARGV_SUBINDEX++)) || true
+        if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+          _shiftopt_next
+        fi
+      } ;;
+      *)
+        printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
+          "$SHIFTOPT_SHORT_OPTIONS" 1>&2
+        _shiftopt_next
+        ;;
     esac
   else
     _shiftopt_next
@@ -129,27 +129,27 @@ printc() {
 }
 printc_init() {
   case "$1" in
-  true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
-  false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
-  "[DEFINE]") {
-    _PRINTC_PATTERN_ANSI=""
-    _PRINTC_PATTERN_PLAIN=""
-    local name
-    local ansi
-    while read -r name ansi; do
-      if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
-        continue
+    true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
+    false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
+    "[DEFINE]") {
+      _PRINTC_PATTERN_ANSI=""
+      _PRINTC_PATTERN_PLAIN=""
+      local name
+      local ansi
+      while read -r name ansi; do
+        if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
+          continue
+        fi
+        ansi="${ansi/\\/\\\\}"
+        _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
+        _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
+      done
+      if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
+      else
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
       fi
-      ansi="${ansi/\\/\\\\}"
-      _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
-      _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
-    done
-    if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
-    else
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
-    fi
-  } ;;
+    } ;;
   esac
 }
 print_warning() {
@@ -209,16 +209,16 @@ version_compare__recurse() {
     c_minor="0."
   fi
   case "$operator" in
-  -eq) [[ $v_major -ne $c_major ]] && return 1 ;;
-  -ne) [[ $v_major -ne $c_major ]] && return 0 ;;
-  -ge | -gt)
-    [[ $v_major -lt $c_major ]] && return 1
-    [[ $v_major -gt $c_major ]] && return 0
-    ;;
-  -le | -lt)
-    [[ $v_major -gt $c_major ]] && return 1
-    [[ $v_major -lt $c_major ]] && return 0
-    ;;
+    -eq) [[ $v_major -ne $c_major ]] && return 1 ;;
+    -ne) [[ $v_major -ne $c_major ]] && return 0 ;;
+    -ge | -gt)
+      [[ $v_major -lt $c_major ]] && return 1
+      [[ $v_major -gt $c_major ]] && return 0
+      ;;
+    -le | -lt)
+      [[ $v_major -gt $c_major ]] && return 1
+      [[ $v_major -lt $c_major ]] && return 0
+      ;;
   esac
   version_compare__recurse "$v_minor" "$operator" "$c_minor"
 }
@@ -266,16 +266,16 @@ FORMATTERS=(
 
 formatter_prettier_supports() {
   case "$1" in
-  .js | .jsx | \
-    .ts | .tsx | \
-    .css | .scss | .sass | \
-    .graphql | .gql | \
-    .html | .svg | \
-    .json | \
-    .md | \
-    .yml)
-    return 0
-    ;;
+    .js | .jsx | \
+      .ts | .tsx | \
+      .css | .scss | .sass | \
+      .graphql | .gql | \
+      .html | .svg | \
+      .json | \
+      .md | \
+      .yml)
+      return 0
+      ;;
   esac
 
   return 1
@@ -286,7 +286,7 @@ formatter_prettier_process() {
   local file="$1"
   local fext="$(extname "$file")"
   case "$fext" in
-  .svg) file="$(basename -- "$file" "$fext").html" ;;
+    .svg) file="$(basename -- "$file" "$fext").html" ;;
   esac
 
   prettier --stdin --stdin-filepath "$file" 2> /dev/null
@@ -297,11 +297,11 @@ formatter_prettier_process() {
 
 formatter_clangformat_supports() {
   case "$1" in
-  .c | .cpp | .cxx | \
-    .h | .hpp | \
-    .m)
-    return 0
-    ;;
+    .c | .cpp | .cxx | \
+      .h | .hpp | \
+      .m)
+      return 0
+      ;;
   esac
 
   return 1
@@ -340,12 +340,12 @@ formatter_shfmt_process() {
 
 formatter_black_supports() {
   case "$1" in
-  .py | \
-    .py3 | \
-    .pyw | \
-    .pyi)
-    return 0
-    ;;
+    .py | \
+      .py3 | \
+      .pyw | \
+      .pyi)
+      return 0
+      ;;
   esac
 
   return 1
@@ -360,12 +360,12 @@ formatter_black_process() {
 
 formatter_mix_format_supports() {
   case "$1" in
-  .ex | \
-    .exs | \
-    .eex | \
-    .heex)
-    return 0
-    ;;
+    .ex | \
+      .exs | \
+      .eex | \
+      .heex)
+      return 0
+      ;;
   esac
 
   return 1
@@ -380,9 +380,9 @@ formatter_mix_format_process() {
 
 formatter_column_supports() {
   case "$1" in
-  .tsv)
-    return 0
-    ;;
+    .tsv)
+      return 0
+      ;;
   esac
 
   return 1
@@ -425,11 +425,11 @@ formatter_yq_supports__version_ok() {
 
 formatter_yq_supports() {
   case "$1" in
-  .yaml | yml | \
-    .json)
-    formatter_yq_supports__version_ok
-    return $?
-    ;;
+    .yaml | yml | \
+      .json)
+      formatter_yq_supports__version_ok
+      return $?
+      ;;
   esac
 
   return 1
@@ -438,7 +438,7 @@ formatter_yq_supports() {
 formatter_yq_process() {
   local args=()
   case "$1" in
-  *.json) args+=(--output-format json) ;;
+    *.json) args+=(--output-format json) ;;
   esac
 
   yq --prettyPrint --indent 4 "${args[@]}" \
@@ -457,25 +457,25 @@ map_language_to_extension() {
   local ext=".txt"
 
   case "$1" in
-  sh | bash) ext=".sh" ;;
-  js | es6 | es) ext=".js" ;;
-  jsx) ext=".jsx" ;;
-  ts) ext=".ts" ;;
-  tsx) ext=".tsx" ;;
-  css) ext=".css" ;;
-  scss) ext=".scss" ;;
-  sass) ext=".sass" ;;
-  svg) ext=".svg" ;;
-  html | htm | shtml | xhtml) ext=".html" ;;
-  json) ext=".json" ;;
-  md | mdown | markdown) ext=".md" ;;
-  yaml | yml) ext=".yml" ;;
-  rust | rs) ext=".rs" ;;
-  graphql | gql) ext=".graphql" ;;
-  python | py | pyi) ext=".py" ;;
-  elixir | ex) ext=".ex" ;;
-  exs) ext=".exs" ;;
-  tsv) ext=".tsv" ;;
+    sh | bash) ext=".sh" ;;
+    js | es6 | es) ext=".js" ;;
+    jsx) ext=".jsx" ;;
+    ts) ext=".ts" ;;
+    tsx) ext=".tsx" ;;
+    css) ext=".css" ;;
+    scss) ext=".scss" ;;
+    sass) ext=".sass" ;;
+    svg) ext=".svg" ;;
+    html | htm | shtml | xhtml) ext=".html" ;;
+    json) ext=".json" ;;
+    md | mdown | markdown) ext=".md" ;;
+    yaml | yml) ext=".yml" ;;
+    rust | rs) ext=".rs" ;;
+    graphql | gql) ext=".graphql" ;;
+    python | py | pyi) ext=".py" ;;
+    elixir | ex) ext=".ex" ;;
+    exs) ext=".exs" ;;
+    tsv) ext=".tsv" ;;
   esac
 
   echo "$ext"
@@ -609,36 +609,36 @@ TERMINAL_WIDTH="$(term_width)"
 while shiftopt; do
   case "$OPT" in
 
-  # Language options
-  -l)
-    shiftval
-    OPT_LANGUAGE="${OPT_VAL}"
-    ;;
-  -l*) OPT_LANGUAGE="${OPT:2}" ;;
-  --language)
-    shiftval
-    OPT_LANGUAGE="$OPT_VAL"
-    ;;
+    # Language options
+    -l)
+      shiftval
+      OPT_LANGUAGE="${OPT_VAL}"
+      ;;
+    -l*) OPT_LANGUAGE="${OPT:2}" ;;
+    --language)
+      shiftval
+      OPT_LANGUAGE="$OPT_VAL"
+      ;;
 
-  # Debug options
-  --debug:formatter) DEBUG_PRINT_FORMATTER=true ;;
+    # Debug options
+    --debug:formatter) DEBUG_PRINT_FORMATTER=true ;;
 
-  # Read from stdin
-  -) FILES+=("-") ;;
+    # Read from stdin
+    -) FILES+=("-") ;;
 
-  # bat options
-  -*) {
-    if [[ -n $OPT_VAL ]]; then
-      BAT_ARGS+=("$OPT=$OPT_VAL")
-    else
-      BAT_ARGS+=("$OPT")
-    fi
-  } ;;
+    # bat options
+    -*) {
+      if [[ -n $OPT_VAL ]]; then
+        BAT_ARGS+=("$OPT=$OPT_VAL")
+      else
+        BAT_ARGS+=("$OPT")
+      fi
+    } ;;
 
-  # Files
-  *) {
-    FILES+=("$OPT")
-  } ;;
+    # Files
+    *) {
+      FILES+=("$OPT")
+    } ;;
 
   esac
 done

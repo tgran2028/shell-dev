@@ -20,7 +20,7 @@ SHIFTOPT_HOOKS=()
 #
 #     SPLIT  -- Splits the option into multiple single-character short options.
 #               "-abc" -> ("-a" "-b" "-c")
-#     
+#
 #     VALUE  -- Uses the remaining characters as the value for the short option.
 #               "-abc" -> ("-a=bc")
 #
@@ -37,14 +37,14 @@ SHIFTOPT_SHORT_OPTIONS="VALUE"
 #
 # Arguments:
 #     ... -- The program arguments.
-# 
+#
 # Example:
 #     setargs "--long=3" "file.txt"
 setargs() {
-	_ARGV=("$@")
-	_ARGV_LAST="$((${#_ARGV[@]} - 1))"
-	_ARGV_INDEX=0
-	_ARGV_SUBINDEX=1
+  _ARGV=("$@")
+  _ARGV_LAST="$((${#_ARGV[@]} - 1))"
+  _ARGV_INDEX=0
+  _ARGV_SUBINDEX=1
 }
 
 # Gets all the remaining unparsed arguments and saves them to a variable.
@@ -52,35 +52,35 @@ setargs() {
 # Arguments:
 #     "-a" -- Append the arguments to the variable instead of replacing it.
 #     $1   -- The variable to save the args to.
-# 
+#
 # Example:
 #     getargs remaining_args
 getargs() {
-	if [[ "$1" = "-a" || "$1" = "--append" ]]; then
-		if [[ "${_ARGV_INDEX}" -ne "$((_ARGV_LAST+1))" ]]; then
-			eval "$2=(\"\${$2[@]}\" $(printf '%q ' "${_ARGV[@]:$_ARGV_INDEX}"))"
-		fi
-	else
-		if [[ "${_ARGV_INDEX}" -ne "$((_ARGV_LAST+1))" ]]; then
-			eval "$1=($(printf '%q ' "${_ARGV[@]:$_ARGV_INDEX}"))"
-		else
-			eval "$1=()"
-		fi
-	fi
+  if [[ "$1" = "-a" || "$1" = "--append" ]]; then
+    if [[ "${_ARGV_INDEX}" -ne "$((_ARGV_LAST + 1))" ]]; then
+      eval "$2=(\"\${$2[@]}\" $(printf '%q ' "${_ARGV[@]:$_ARGV_INDEX}"))"
+    fi
+  else
+    if [[ "${_ARGV_INDEX}" -ne "$((_ARGV_LAST + 1))" ]]; then
+      eval "$1=($(printf '%q ' "${_ARGV[@]:$_ARGV_INDEX}"))"
+    else
+      eval "$1=()"
+    fi
+  fi
 }
 
 # Resets the internal _ARGV* variables to the original script arguments.
 # This is the equivalent of storing the top-level $@ and using setargs with it.
 resetargs() {
-	setargs "${_ARGV_ORIGINAL[@]}"
+  setargs "${_ARGV_ORIGINAL[@]}"
 }
 
 # INTERNAL.
 #
-# Increments the argv index pointer used by `shiftopt`.  
+# Increments the argv index pointer used by `shiftopt`.
 _shiftopt_next() {
-	_ARGV_SUBINDEX=1
-	((_ARGV_INDEX++)) || true
+  _ARGV_SUBINDEX=1
+  ((_ARGV_INDEX++)) || true
 }
 
 # Gets the next option passed to the script.
@@ -98,63 +98,66 @@ _shiftopt_next() {
 #         echo "$OPT = $OPT_VAL"
 #     done
 shiftopt() {
-	# Read the top of _ARGV.
-	[[ "$_ARGV_INDEX" -gt "$_ARGV_LAST" ]] && return 1
-	OPT="${_ARGV[$_ARGV_INDEX]}"
-	unset OPT_VAL
+  # Read the top of _ARGV.
+  [[ "$_ARGV_INDEX" -gt "$_ARGV_LAST" ]] && return 1
+  OPT="${_ARGV[$_ARGV_INDEX]}"
+  unset OPT_VAL
 
-	if [[ "$OPT" =~ ^-[a-zA-Z0-9_-]+=.* ]]; then
-		OPT_VAL="${OPT#*=}"
-		OPT="${OPT%%=*}"
-	fi
-	
-	# Handle short options.
-	if [[ "$OPT" =~ ^-[^-]{2,} ]]; then
-		case "$SHIFTOPT_SHORT_OPTIONS" in
-		 	# PASS mode: "-abc=0" -> ("-abc=0")
-			PASS) _shiftopt_next ;;
+  if [[ "$OPT" =~ ^-[a-zA-Z0-9_-]+=.* ]]; then
+    OPT_VAL="${OPT#*=}"
+    OPT="${OPT%%=*}"
+  fi
 
-			# CONV mode: "-abc=0" -> ("--abc=0")
-			CONV) OPT="-${OPT}"; _shiftopt_next ;; 
+  # Handle short options.
+  if [[ "$OPT" =~ ^-[^-]{2,} ]]; then
+    case "$SHIFTOPT_SHORT_OPTIONS" in
+      # PASS mode: "-abc=0" -> ("-abc=0")
+      PASS) _shiftopt_next ;;
 
-			# VALUE mode: "-abc=0" -> ("-a=bc=0")
-			VALUE) {
-				OPT="${_ARGV[$_ARGV_INDEX]}"
-				OPT_VAL="${OPT:2}"
-				OPT="${OPT:0:2}"
-				_shiftopt_next
-			} ;; 
+      # CONV mode: "-abc=0" -> ("--abc=0")
+      CONV)
+        OPT="-${OPT}"
+        _shiftopt_next
+        ;;
 
-			# SPLIT mode: "-abc=0" -> ("-a=0" "-b=0" "-c=0")
-			SPLIT) {
-				OPT="-${OPT:$_ARGV_SUBINDEX:1}"
-				((_ARGV_SUBINDEX++)) || true
-				if [[ "$_ARGV_SUBINDEX" -gt "${#OPT}" ]]; then
-					_shiftopt_next
-				fi
-			} ;;
+      # VALUE mode: "-abc=0" -> ("-a=bc=0")
+      VALUE) {
+        OPT="${_ARGV[$_ARGV_INDEX]}"
+        OPT_VAL="${OPT:2}"
+        OPT="${OPT:0:2}"
+        _shiftopt_next
+      } ;;
 
-			# ????? mode: Treat it as pass.
-			*)
-				printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
-					"$SHIFTOPT_SHORT_OPTIONS" 1>&2
-				_shiftopt_next
-				;;
-		esac
-	else
-		_shiftopt_next
-	fi
+      # SPLIT mode: "-abc=0" -> ("-a=0" "-b=0" "-c=0")
+      SPLIT) {
+        OPT="-${OPT:$_ARGV_SUBINDEX:1}"
+        ((_ARGV_SUBINDEX++)) || true
+        if [[ "$_ARGV_SUBINDEX" -gt "${#OPT}" ]]; then
+          _shiftopt_next
+        fi
+      } ;;
 
-	# Handle hooks.
-	local hook
-	for hook in "${SHIFTOPT_HOOKS[@]}"; do
-		if "$hook"; then
-			shiftopt
-			return $?
-		fi
-	done
+      # ????? mode: Treat it as pass.
+      *)
+        printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
+          "$SHIFTOPT_SHORT_OPTIONS" 1>&2
+        _shiftopt_next
+        ;;
+    esac
+  else
+    _shiftopt_next
+  fi
 
-	return 0
+  # Handle hooks.
+  local hook
+  for hook in "${SHIFTOPT_HOOKS[@]}"; do
+    if "$hook"; then
+      shiftopt
+      return $?
+    fi
+  done
+
+  return 0
 }
 
 # Gets the value for the current option.
@@ -166,31 +169,31 @@ shiftopt() {
 #     0       -- An option value was read.
 #     EXIT 1  -- No option value was available.
 shiftval() {
-	# Skip if a value was already provided.
-	if [[ -n "${OPT_VAL+x}" ]]; then
-		return 0
-	fi
-	
-	if [[ "$_ARGV_SUBINDEX" -gt 1 && "$SHIFTOPT_SHORT_OPTIONS" = "SPLIT" ]]; then
-		# If it's a short group argument in SPLIT mode, we grab the next argument.
-		OPT_VAL="${_ARGV[$((_ARGV_INDEX+1))]}"
-	else
-		# Otherwise, we can handle it normally.
-		OPT_VAL="${_ARGV[$_ARGV_INDEX]}"
-		_shiftopt_next
-	fi
+  # Skip if a value was already provided.
+  if [[ -n "${OPT_VAL+x}" ]]; then
+    return 0
+  fi
 
-	# Error if no value is provided.
-	if [[ "$OPT_VAL" =~ -.* ]]; then
-		printc "%{RED}%s: '%s' requires a value%{CLEAR}\n" "$PROGRAM" "$ARG"
-		exit 1
-	fi
+  if [[ "$_ARGV_SUBINDEX" -gt 1 && "$SHIFTOPT_SHORT_OPTIONS" = "SPLIT" ]]; then
+    # If it's a short group argument in SPLIT mode, we grab the next argument.
+    OPT_VAL="${_ARGV[$((_ARGV_INDEX + 1))]}"
+  else
+    # Otherwise, we can handle it normally.
+    OPT_VAL="${_ARGV[$_ARGV_INDEX]}"
+    _shiftopt_next
+  fi
+
+  # Error if no value is provided.
+  if [[ "$OPT_VAL" =~ -.* ]]; then
+    printc "%{RED}%s: '%s' requires a value%{CLEAR}\n" "$PROGRAM" "$ARG"
+    exit 1
+  fi
 }
 
 # -----------------------------------------------------------------------------
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-	# If this script is executed, run the tests.
-	# shellcheck source=/dev/null
-	setargs "$@"
-	_ARGV_ORIGINAL=("$@")
-fi 
+  # If this script is executed, run the tests.
+  # shellcheck source=/dev/null
+  setargs "$@"
+  _ARGV_ORIGINAL=("$@")
+fi

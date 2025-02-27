@@ -13,27 +13,27 @@ printc() {
 }
 printc_init() {
   case "$1" in
-  true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
-  false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
-  "[DEFINE]") {
-    _PRINTC_PATTERN_ANSI=""
-    _PRINTC_PATTERN_PLAIN=""
-    local name
-    local ansi
-    while read -r name ansi; do
-      if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
-        continue
+    true) _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI" ;;
+    false) _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN" ;;
+    "[DEFINE]") {
+      _PRINTC_PATTERN_ANSI=""
+      _PRINTC_PATTERN_PLAIN=""
+      local name
+      local ansi
+      while read -r name ansi; do
+        if [[ -z $name && -z $ansi ]] || [[ ${name:0:1} == "#" ]]; then
+          continue
+        fi
+        ansi="${ansi/\\/\\\\}"
+        _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
+        _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
+      done
+      if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
+      else
+        _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
       fi
-      ansi="${ansi/\\/\\\\}"
-      _PRINTC_PATTERN_PLAIN="${_PRINTC_PATTERN_PLAIN}s/%{$name}//g;"
-      _PRINTC_PATTERN_ANSI="${_PRINTC_PATTERN_ANSI}s/%{$name}/$ansi/g;"
-    done
-    if [[ -t 1 && -z ${NO_COLOR+x} ]]; then
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_ANSI"
-    else
-      _PRINTC_PATTERN="$_PRINTC_PATTERN_PLAIN"
-    fi
-  } ;;
+    } ;;
   esac
 }
 print_warning() {
@@ -192,29 +192,29 @@ shiftopt() {
   fi
   if [[ $OPT =~ ^-[^-]{2,} ]]; then
     case "$SHIFTOPT_SHORT_OPTIONS" in
-    PASS) _shiftopt_next ;;
-    CONV)
-      OPT="-$OPT"
-      _shiftopt_next
-      ;;
-    VALUE) {
-      OPT="${_ARGV[$_ARGV_INDEX]}"
-      OPT_VAL="${OPT:2}"
-      OPT="${OPT:0:2}"
-      _shiftopt_next
-    } ;;
-    SPLIT) {
-      OPT="-${OPT:_ARGV_SUBINDEX:1}"
-      ((_ARGV_SUBINDEX++)) || true
-      if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+      PASS) _shiftopt_next ;;
+      CONV)
+        OPT="-$OPT"
         _shiftopt_next
-      fi
-    } ;;
-    *)
-      printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
-        "$SHIFTOPT_SHORT_OPTIONS" 1>&2
-      _shiftopt_next
-      ;;
+        ;;
+      VALUE) {
+        OPT="${_ARGV[$_ARGV_INDEX]}"
+        OPT_VAL="${OPT:2}"
+        OPT="${OPT:0:2}"
+        _shiftopt_next
+      } ;;
+      SPLIT) {
+        OPT="-${OPT:_ARGV_SUBINDEX:1}"
+        ((_ARGV_SUBINDEX++)) || true
+        if [[ $_ARGV_SUBINDEX -gt ${#OPT} ]]; then
+          _shiftopt_next
+        fi
+      } ;;
+      *)
+        printf "shiftopt: unknown SHIFTOPT_SHORT_OPTIONS mode '%s'" \
+          "$SHIFTOPT_SHORT_OPTIONS" 1>&2
+        _shiftopt_next
+        ;;
     esac
   else
     _shiftopt_next
@@ -251,20 +251,20 @@ hook_color() {
   SHIFTOPT_HOOKS+=("__shiftopt_hook__color")
   __shiftopt_hook__color() {
     case "$OPT" in
-    --no-color) OPT_COLOR=false ;;
-    --color) {
-      case "$OPT_VAL" in
-      "") OPT_COLOR=true ;;
-      always | true) OPT_COLOR=true ;;
-      never | false) OPT_COLOR=false ;;
-      auto) return 0 ;;
-      *)
-        printc "%{RED}%s: '--color' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batgrep"
-        exit 1
-        ;;
-      esac
-    } ;;
-    *) return 1 ;;
+      --no-color) OPT_COLOR=false ;;
+      --color) {
+        case "$OPT_VAL" in
+          "") OPT_COLOR=true ;;
+          always | true) OPT_COLOR=true ;;
+          never | false) OPT_COLOR=false ;;
+          auto) return 0 ;;
+          *)
+            printc "%{RED}%s: '--color' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batgrep"
+            exit 1
+            ;;
+        esac
+      } ;;
+      *) return 1 ;;
     esac
     printc_init "$OPT_COLOR"
     return 0
@@ -306,30 +306,30 @@ hook_pager() {
   SHIFTOPT_HOOKS+=("__shiftopt_hook__pager")
   __shiftopt_hook__pager() {
     case "$OPT" in
-    --no-pager)
-      shiftval
-      SCRIPT_PAGER_CMD=''
-      ;;
-    --paging) {
-      shiftval
-      case "$OPT_VAL" in
-      auto) : ;;
-      always) : ;;
-      never) SCRIPT_PAGER_CMD='' ;;
-      *)
-        printc "%{RED}%s: '--paging' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batgrep"
-        exit 1
+      --no-pager)
+        shiftval
+        SCRIPT_PAGER_CMD=''
         ;;
-      esac
-    } ;;
-    --pager) {
-      shiftval
-      {
-        SCRIPT_PAGER_CMD=($OPT_VAL)
-        PAGER_ARGS=()
-      }
-    } ;;
-    *) return 1 ;;
+      --paging) {
+        shiftval
+        case "$OPT_VAL" in
+          auto) : ;;
+          always) : ;;
+          never) SCRIPT_PAGER_CMD='' ;;
+          *)
+            printc "%{RED}%s: '--paging' expects value of 'auto', 'always', or 'never'%{CLEAR}\n" "batgrep"
+            exit 1
+            ;;
+        esac
+      } ;;
+      --pager) {
+        shiftval
+        {
+          SCRIPT_PAGER_CMD=($OPT_VAL)
+          PAGER_ARGS=()
+        }
+      } ;;
+      *) return 1 ;;
     esac
   }
 }
@@ -367,11 +367,11 @@ hook_width() {
   SHIFTOPT_HOOKS+=("__shiftopt_hook__width")
   __shiftopt_hook__width() {
     case "$OPT" in
-    --terminal-width)
-      shiftval
-      OPT_TERMINAL_WIDTH="$OPT_VAL"
-      ;;
-    *) return 1 ;;
+      --terminal-width)
+        shiftval
+        OPT_TERMINAL_WIDTH="$OPT_VAL"
+        ;;
+      *) return 1 ;;
     esac
     return 0
   }
@@ -416,16 +416,16 @@ version_compare__recurse() {
     c_minor="0."
   fi
   case "$operator" in
-  -eq) [[ $v_major -ne $c_major ]] && return 1 ;;
-  -ne) [[ $v_major -ne $c_major ]] && return 0 ;;
-  -ge | -gt)
-    [[ $v_major -lt $c_major ]] && return 1
-    [[ $v_major -gt $c_major ]] && return 0
-    ;;
-  -le | -lt)
-    [[ $v_major -gt $c_major ]] && return 1
-    [[ $v_major -lt $c_major ]] && return 0
-    ;;
+    -eq) [[ $v_major -ne $c_major ]] && return 1 ;;
+    -ne) [[ $v_major -ne $c_major ]] && return 0 ;;
+    -ge | -gt)
+      [[ $v_major -lt $c_major ]] && return 1
+      [[ $v_major -gt $c_major ]] && return 0
+      ;;
+    -le | -lt)
+      [[ $v_major -gt $c_major ]] && return 1
+      [[ $v_major -lt $c_major ]] && return 0
+      ;;
   esac
   version_compare__recurse "$v_minor" "$operator" "$c_minor"
 }
@@ -582,19 +582,19 @@ if [[ -n $RIPGREP_CONFIG_PATH && -e $RIPGREP_CONFIG_PATH ]]; then
   setargs $(cat "$RIPGREP_CONFIG_PATH")
   while shiftopt; do
     case "$OPT" in
-    -A | --after-context)
-      shiftval
-      OPT_CONTEXT_AFTER="$OPT_VAL"
-      ;;
-    -B | --before-context)
-      shiftval
-      OPT_CONTEXT_BEFORE="$OPT_VAL"
-      ;;
-    -C | --context)
-      shiftval
-      OPT_CONTEXT_BEFORE="$OPT_VAL"
-      OPT_CONTEXT_AFTER="$OPT_VAL"
-      ;;
+      -A | --after-context)
+        shiftval
+        OPT_CONTEXT_AFTER="$OPT_VAL"
+        ;;
+      -B | --before-context)
+        shiftval
+        OPT_CONTEXT_BEFORE="$OPT_VAL"
+        ;;
+      -C | --context)
+        shiftval
+        OPT_CONTEXT_BEFORE="$OPT_VAL"
+        OPT_CONTEXT_AFTER="$OPT_VAL"
+        ;;
     esac
   done
 fi
@@ -608,9 +608,9 @@ resetargs
 SHIFTOPT_SHORT_OPTIONS="PASS"
 while shiftopt; do
   case "$OPT" in
-  [-]+(u))
-    RG_ARGS+=("$OPT")
-    ;;
+    [-]+(u))
+      RG_ARGS+=("$OPT")
+      ;;
   esac
 done
 resetargs
@@ -618,102 +618,102 @@ SHIFTOPT_SHORT_OPTIONS="VALUE"
 while shiftopt; do
   case "$OPT" in
 
-  # ripgrep options
-  [-]+([u])) ;; # Ignore - handled in first loop.
-  --unrestricted)
-    RG_ARGS+=("$OPT")
-    ;;
-  -i | --ignore-case) OPT_CASE_SENSITIVITY="--ignore-case" ;;
-  -s | --case-sensitive) OPT_CASE_SENSITIVITY="--case-sensitive" ;;
-  -S | --smart-case) OPT_CASE_SENSITIVITY="--smart-case" ;;
+    # ripgrep options
+    [-]+([u])) ;; # Ignore - handled in first loop.
+    --unrestricted)
+      RG_ARGS+=("$OPT")
+      ;;
+    -i | --ignore-case) OPT_CASE_SENSITIVITY="--ignore-case" ;;
+    -s | --case-sensitive) OPT_CASE_SENSITIVITY="--case-sensitive" ;;
+    -S | --smart-case) OPT_CASE_SENSITIVITY="--smart-case" ;;
 
-  -A | --after-context)
-    shiftval
-    OPT_CONTEXT_AFTER="$OPT_VAL"
-    ;;
-  -B | --before-context)
-    shiftval
-    OPT_CONTEXT_BEFORE="$OPT_VAL"
-    ;;
-  -C | --context)
-    shiftval
-    OPT_CONTEXT_BEFORE="$OPT_VAL"
-    OPT_CONTEXT_AFTER="$OPT_VAL"
-    ;;
+    -A | --after-context)
+      shiftval
+      OPT_CONTEXT_AFTER="$OPT_VAL"
+      ;;
+    -B | --before-context)
+      shiftval
+      OPT_CONTEXT_BEFORE="$OPT_VAL"
+      ;;
+    -C | --context)
+      shiftval
+      OPT_CONTEXT_BEFORE="$OPT_VAL"
+      OPT_CONTEXT_AFTER="$OPT_VAL"
+      ;;
 
-  -F | --fixed-strings)
-    OPT_FIXED_STRINGS=true
-    RG_ARGS+=("$OPT")
-    ;;
+    -F | --fixed-strings)
+      OPT_FIXED_STRINGS=true
+      RG_ARGS+=("$OPT")
+      ;;
 
-  -U | --multiline | \
-    -P | --pcre2 | \
-    -z | --search-zip | \
-    -w | --word-regexp | \
-    --one-file-system | \
-    --multiline-dotall | \
-    --ignore | --no-ignore | \
-    --crlf | --no-crlf | \
-    --hidden | --no-hidden)
-    RG_ARGS+=("$OPT")
-    ;;
+    -U | --multiline | \
+      -P | --pcre2 | \
+      -z | --search-zip | \
+      -w | --word-regexp | \
+      --one-file-system | \
+      --multiline-dotall | \
+      --ignore | --no-ignore | \
+      --crlf | --no-crlf | \
+      --hidden | --no-hidden)
+      RG_ARGS+=("$OPT")
+      ;;
 
-  -E | --encoding | \
-    -g | --glob | \
-    -t | --type | \
-    -T | --type-not | \
-    -m | --max-count | \
-    --max-depth | \
-    --iglob | \
-    --ignore-file)
-    shiftval
-    RG_ARGS+=("$OPT" "$OPT_VAL")
-    ;;
+    -E | --encoding | \
+      -g | --glob | \
+      -t | --type | \
+      -T | --type-not | \
+      -m | --max-count | \
+      --max-depth | \
+      --iglob | \
+      --ignore-file)
+      shiftval
+      RG_ARGS+=("$OPT" "$OPT_VAL")
+      ;;
 
-  # bat options
+    # bat options
 
-  # Script options
-  --no-follow) OPT_FOLLOW=false ;;
-  --no-snip) OPT_SNIP="" ;;
-  --no-highlight) OPT_HIGHLIGHT=false ;;
-  -p | --search-pattern) OPT_SEARCH_PATTERN=true ;;
-  --no-search-pattern) OPT_SEARCH_PATTERN=false ;;
-  --no-separator) OPT_NO_SEPARATOR=true ;;
-  --rga) {
-    if ! rga --version | grep 'ripgrep-all' &> /dev/null; then
-      printc "%{RED}%s: option '--rga' requires ripgrep-all to be installed%{CLEAR}\n" "batgrep" 1>&2
+    # Script options
+    --no-follow) OPT_FOLLOW=false ;;
+    --no-snip) OPT_SNIP="" ;;
+    --no-highlight) OPT_HIGHLIGHT=false ;;
+    -p | --search-pattern) OPT_SEARCH_PATTERN=true ;;
+    --no-search-pattern) OPT_SEARCH_PATTERN=false ;;
+    --no-separator) OPT_NO_SEPARATOR=true ;;
+    --rga) {
+      if ! rga --version | grep 'ripgrep-all' &> /dev/null; then
+        printc "%{RED}%s: option '--rga' requires ripgrep-all to be installed%{CLEAR}\n" "batgrep" 1>&2
+        exit 1
+      fi
+
+      RIPGREP='rga'
+    } ;;
+
+    # Option forwarding
+    --rg:*) {
+      if [[ ${OPT:5:1} == "-" ]]; then
+        RG_ARGS+=("${OPT:5}")
+      else
+        RG_ARGS+=("--${OPT:5}")
+      fi
+      if [[ -n $OPT_VAL ]]; then
+        RG_ARGS+=("$OPT_VAL")
+      fi
+    } ;;
+
+    # --
+    --)
+      getargs -a FILES
+      break
+      ;;
+
+    # ???
+    -*) {
+      printc "%{RED}%s: unknown option '%s'%{CLEAR}\n" "batgrep" "$OPT" 1>&2
       exit 1
-    fi
+    } ;;
 
-    RIPGREP='rga'
-  } ;;
-
-  # Option forwarding
-  --rg:*) {
-    if [[ ${OPT:5:1} == "-" ]]; then
-      RG_ARGS+=("${OPT:5}")
-    else
-      RG_ARGS+=("--${OPT:5}")
-    fi
-    if [[ -n $OPT_VAL ]]; then
-      RG_ARGS+=("$OPT_VAL")
-    fi
-  } ;;
-
-  # --
-  --)
-    getargs -a FILES
-    break
-    ;;
-
-  # ???
-  -*) {
-    printc "%{RED}%s: unknown option '%s'%{CLEAR}\n" "batgrep" "$OPT" 1>&2
-    exit 1
-  } ;;
-
-  # Search
-  *) FILES+=("$OPT") ;;
+    # Search
+    *) FILES+=("$OPT") ;;
 
   esac
 done

@@ -5,27 +5,21 @@
       "title": "argument",
       "description": "A positional argument of the current script or sub-command\nhttps://bashly.dev/configuration/argument/",
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "title": "name",
           "description": "A name of the current positional argument\nhttps://bashly.dev/configuration/argument/#name",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "user"
-          ]
+          "examples": ["user"]
         },
         "help": {
           "title": "help",
           "description": "A description of the current positional argument\nhttps://bashly.dev/configuration/argument/#help",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "AWS Username"
-          ]
+          "examples": ["AWS Username"]
         },
         "default": {
           "title": "default",
@@ -42,9 +36,7 @@
               }
             }
           ],
-          "examples": [
-            "*.jpg"
-          ]
+          "examples": ["*.jpg"]
         },
         "required": {
           "title": "required",
@@ -62,9 +54,7 @@
             "description": "A valid value of the current positional argument",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "eu"
-            ]
+            "examples": ["eu"]
           }
         },
         "repeatable": {
@@ -77,12 +67,7 @@
           "title": "validate",
           "description": "A validation function of the current positional argument\nhttps://bashly.dev/configuration/argument/#validate",
           "type": "string",
-          "examples": [
-            "file_exists",
-            "dir_exists",
-            "integer",
-            "non_empty"
-          ]
+          "examples": ["file_exists", "dir_exists", "integer", "non_empty"]
         },
         "unique": {
           "title": "unique",
@@ -104,9 +89,7 @@
         "^x_.": {
           "title": "custom property",
           "description": "A custom property of any type",
-          "examples": [
-            "Anything"
-          ]
+          "examples": ["Anything"]
         }
       },
       "additionalProperties": false
@@ -117,14 +100,10 @@
       "type": "object",
       "anyOf": [
         {
-          "required": [
-            "long"
-          ]
+          "required": ["long"]
         },
         {
-          "required": [
-            "short"
-          ]
+          "required": ["short"]
         }
       ],
       "properties": {
@@ -133,36 +112,28 @@
           "description": "A long form of the current flag\nhttps://bashly.dev/configuration/flag/#long",
           "type": "string",
           "pattern": "^--",
-          "examples": [
-            "--ssh"
-          ]
+          "examples": ["--ssh"]
         },
         "short": {
           "title": "short",
           "description": "A short form of the current flag\nhttps://bashly.dev/configuration/flag/#short",
           "type": "string",
           "pattern": "^-[^-]",
-          "examples": [
-            "-s"
-          ]
+          "examples": ["-s"]
         },
         "help": {
           "title": "help",
           "description": "A description of the current flag\nhttps://bashly.dev/configuration/flag/#help",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "Clone using SSH"
-          ]
+          "examples": ["Clone using SSH"]
         },
         "arg": {
           "title": "arg",
           "description": "An argument name of the current flag\nhttps://bashly.dev/configuration/flag/#arg",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "user"
-          ]
+          "examples": ["user"]
         },
         "default": {
           "title": "default",
@@ -179,9 +150,7 @@
               }
             }
           ],
-          "examples": [
-            "*.jpg"
-          ]
+          "examples": ["*.jpg"]
         },
         "required": {
           "title": "required",
@@ -199,9 +168,7 @@
             "description": "A valid value of the current positional argument",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "user"
-            ]
+            "examples": ["user"]
           }
         },
         "conflicts": {
@@ -214,9 +181,7 @@
             "description": "The long form of the required flag",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "--no-cache"
-            ]
+            "examples": ["--no-cache"]
           }
         },
         "needs": {
@@ -229,9 +194,7 @@
             "description": "The long form of the required flag",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "--command"
-            ]
+            "examples": ["--command"]
           }
         },
         "completions": {
@@ -262,12 +225,7 @@
           "title": "validate",
           "description": "A validation function of the current flag\nhttps://bashly.dev/configuration/flag/#validate",
           "type": "string",
-          "examples": [
-            "file_exists",
-            "dir_exists",
-            "integer",
-            "non_empty"
-          ]
+          "examples": ["file_exists", "dir_exists", "integer", "non_empty"]
         },
         "unique": {
           "title": "unique",
@@ -289,9 +247,7 @@
         "^x_.": {
           "title": "custom property",
           "description": "A custom property of any type",
-          "examples": [
-            "Anything"
-          ]
+          "examples": ["Anything"]
         }
       },
       "additionalProperties": false
@@ -300,27 +256,21 @@
       "title": "environment variable",
       "description": "An environment variable of the current application\nhttps://bashly.dev/configuration/environment-variable/#environment-variable",
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "title": "name",
           "description": "A name of the current environment variable\nhttps://bashly.dev/configuration/environment-variable/#name",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "config_path"
-          ]
+          "examples": ["config_path"]
         },
         "help": {
           "title": "help",
           "description": "A description of the current environment variable\nhttps://bashly.dev/configuration/environment-variable/#help",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "Location of the config file"
-          ]
+          "examples": ["Location of the config file"]
         },
         "private": {
           "title": "private",
@@ -338,12 +288,7 @@
           "title": "validate",
           "description": "A validation function for the current environment variable\nhttps://bashly.dev/configuration/environment-variable/#validate",
           "type": "string",
-          "examples": [
-            "file_exists",
-            "dir_exists",
-            "integer",
-            "non_empty"
-          ]
+          "examples": ["file_exists", "dir_exists", "integer", "non_empty"]
         },
         "allowed": {
           "title": "allowed",
@@ -355,27 +300,21 @@
             "description": "A valid value of the current environment variable",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "production"
-            ]
+            "examples": ["production"]
           }
         },
         "default": {
           "title": "default",
           "description": "A default value of the current environment variable\nhttps://bashly.dev/configuration/environment-variable/#default",
           "type": "string",
-          "examples": [
-            "~/config.ini"
-          ]
+          "examples": ["~/config.ini"]
         }
       },
       "patternProperties": {
         "^x_.": {
           "title": "custom property",
           "description": "A custom property of any type",
-          "examples": [
-            "Anything"
-          ]
+          "examples": ["Anything"]
         }
       },
       "additionalProperties": false
@@ -384,28 +323,21 @@
       "title": "variable",
       "description": "A global bash variable\nhttps://bashly.dev/configuration/variable/#variable",
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "title": "name",
           "description": "A name for the current variable\nhttps://bashly.dev/configuration/variable/#name",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "output_dir"
-          ]
+          "examples": ["output_dir"]
         },
         "value": {
           "title": "value",
           "description": "A value for the current variable\nhttps://bashly.dev/configuration/variable/#value",
           "examples": [
             "./output",
-            [
-              "development",
-              "production"
-            ],
+            ["development", "production"],
             {
               "verbosity": 3,
               "debug": true
@@ -417,9 +349,7 @@
         "^x_.": {
           "title": "custom property",
           "description": "A custom property of any type",
-          "examples": [
-            "Anything"
-          ]
+          "examples": ["Anything"]
         }
       },
       "additionalProperties": false
@@ -429,9 +359,7 @@
       "description": "A name of the current script or sub-command\nhttps://bashly.dev/configuration/command/#name",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "source"
-      ]
+      "examples": ["source"]
     },
     "sub-command-alias-property": {
       "$comment": "'sub-command-' prefix is used as this property is marked with 'Sub-Commands Only' badge",
@@ -441,9 +369,7 @@
           "description": "An alias of the current sub-command\nhttps://bashly.dev/configuration/command/#alias",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "s"
-          ]
+          "examples": ["s"]
         },
         {
           "description": "Aliases of the current sub-command\nhttps://bashly.dev/configuration/command/#alias",
@@ -454,9 +380,7 @@
             "description": "An alias of the current sub-command",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "s"
-            ]
+            "examples": ["s"]
           }
         }
       ]
@@ -466,18 +390,14 @@
       "description": "A description of the current script or sub-command\nhttps://bashly.dev/configuration/command/#help",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "URL to download from"
-      ]
+      "examples": ["URL to download from"]
     },
     "help-header-override-property": {
       "title": "help_header_override",
       "description": "Bash code (or function call) that will be executed at the beginning of the help message\nhttps://bashly.dev/configuration/command/#help-header-override",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "generate_ascii_art_logo"
-      ]
+      "examples": ["generate_ascii_art_logo"]
     },
     "args-property": {
       "title": "args",
@@ -515,9 +435,7 @@
       "description": "A version of the current script\nhttps://bashly.dev/configuration/command/#version",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "0.1.0"
-      ]
+      "examples": ["0.1.0"]
     },
     "sub-command-default-property": {
       "title": "default",
@@ -529,9 +447,7 @@
         },
         {
           "type": "string",
-          "enum": [
-            "force"
-          ]
+          "enum": ["force"]
         }
       ]
     },
@@ -562,9 +478,7 @@
           "description": "An example of the current script or sub-command\nhttps://bashly.dev/configuration/command/#examples",
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "cli upload profile.png -u admin -p s3cr3t"
-          ]
+          "examples": ["cli upload profile.png -u admin -p s3cr3t"]
         },
         {
           "description": "Examples of the current script or sub-command\nhttps://bashly.dev/configuration/command/#examples",
@@ -575,9 +489,7 @@
             "description": "An example of the current script or sub-command\nhttps://bashly.dev/configuration/command/#examples",
             "type": "string",
             "minLength": 1,
-            "examples": [
-              "cli upload profile.png -u admin -p s3cr3t"
-            ]
+            "examples": ["cli upload profile.png -u admin -p s3cr3t"]
           }
         }
       ]
@@ -587,18 +499,14 @@
       "description": "A description footer for the current script or sub-command\nhttps://bashly.dev/configuration/command/#footer",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "This will appear at the end of the --help message"
-      ]
+      "examples": ["This will appear at the end of the --help message"]
     },
     "sub-command-group-property": {
       "title": "group",
       "description": "A group of the current sub-command\nhttps://bashly.dev/configuration/command/#group",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "File"
-      ]
+      "examples": ["File"]
     },
     "catch-all-property": {
       "title": "catch all",
@@ -611,9 +519,7 @@
         {
           "type": "string",
           "minLength": 1,
-          "examples": [
-            "Additional arguments or flags for AWS CLI"
-          ]
+          "examples": ["Additional arguments or flags for AWS CLI"]
         },
         {
           "type": "object",
@@ -622,17 +528,13 @@
               "description": "A label for the current argument or flag\nhttps://bashly.dev/configuration/command/#catch_all",
               "type": "string",
               "minLength": 1,
-              "examples": [
-                "AWS Params"
-              ]
+              "examples": ["AWS Params"]
             },
             "help": {
               "description": "A description for the current argument or flag\nhttps://bashly.dev/configuration/command/#catch_all",
               "type": "string",
               "minLength": 1,
-              "examples": [
-                "Additional arguments or flags for AWS CLI"
-              ]
+              "examples": ["Additional arguments or flags for AWS CLI"]
             },
             "required": {
               "description": "Whether the current argument or flag is required\nhttps://bashly.dev/configuration/command/#catch_all",
@@ -692,9 +594,7 @@
         "description": "A dependency of the current script or sub-command\nhttps://bashly.dev/configuration/dependency/#command",
         "type": "string",
         "minLength": 1,
-        "examples": [
-          "git"
-        ]
+        "examples": ["git"]
       }
     },
     "dependencies-help-property": {
@@ -702,9 +602,7 @@
       "description": "A help for the current dependency\nhttps://bashly.dev/configuration/dependency/#help",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "Run 'sudo apt install git'"
-      ]
+      "examples": ["Run 'sudo apt install git'"]
     },
     "dependencies-property": {
       "title": "dependencies",
@@ -743,9 +641,7 @@
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "command"
-                  ],
+                  "required": ["command"],
                   "properties": {
                     "command": {
                       "$ref": "#/definitions/dependencies-command-property"
@@ -773,9 +669,7 @@
         },
         {
           "type": "string",
-          "enum": [
-            "always"
-          ]
+          "enum": ["always"]
         }
       ]
     },
@@ -789,9 +683,7 @@
         },
         {
           "type": "string",
-          "examples": [
-            "git"
-          ]
+          "examples": ["git"]
         }
       ]
     },
@@ -800,9 +692,7 @@
       "description": "A partial file path of the current script or sub-command\nhttps://bashly.dev/configuration/command/#filename",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "dir_commands/list.sh"
-      ]
+      "examples": ["dir_commands/list.sh"]
     },
     "filters-property": {
       "title": "filters",
@@ -813,9 +703,7 @@
         "description": "A filter of the current script or sub-command",
         "type": "string",
         "minLength": 1,
-        "examples": [
-          "docker_running"
-        ]
+        "examples": ["docker_running"]
       }
     },
     "function-property": {
@@ -823,9 +711,7 @@
       "description": "An internal function for the current script or sub-command\nhttps://bashly.dev/configuration/command/#function",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "deprecated_container_start"
-      ]
+      "examples": ["deprecated_container_start"]
     },
     "sub-command-private-property": {
       "title": "private",
@@ -838,9 +724,7 @@
       "description": "A file import for the current sub-command\nhttps://bashly.dev/configuration/command/#import",
       "type": "string",
       "minLength": 1,
-      "examples": [
-        "src/download_command.sh"
-      ]
+      "examples": ["src/download_command.sh"]
     },
     "command-property": {
       "title": "command",
@@ -918,9 +802,7 @@
         "^x_.": {
           "title": "custom property",
           "description": "A custom property of any type",
-          "examples": [
-            "Anything"
-          ]
+          "examples": ["Anything"]
         }
       },
       "additionalProperties": false
@@ -989,9 +871,7 @@
     "^x_.": {
       "title": "custom property",
       "description": "A custom property of any type",
-      "examples": [
-        "Anything"
-      ]
+      "examples": ["Anything"]
     }
   },
   "additionalProperties": false

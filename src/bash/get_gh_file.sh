@@ -205,78 +205,78 @@
 
 function help_text_util {
 
-    local help_text
-    local color='always'  # [always|auto|never]
-    local outfile
+  local help_text
+  local color='always' # [always|auto|never]
+  local outfile
 
-    local -a bat_args=()
+  local -a bat_args=()
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -c | --color)
-                color=$2
-                shift 2
-                ;;
-            -o | --outfile)
-                outfile=$2
-                shift 2
-                ;;
-            --bat-args)
-                IFS = ' ' read -r -a bat_args <<< "${2/\n/ }"
-                shift 2
-                ;;
-            *)
-                help_text=$1
-                shift
-                ;;
-        esac
-    done
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -c | --color)
+        color=$2
+        shift 2
+        ;;
+      -o | --outfile)
+        outfile=$2
+        shift 2
+        ;;
+      --bat-args)
+        IFS = ' ' read -r -a bat_args <<< "${2/\n/ }"
+        shift 2
+        ;;
+      *)
+        help_text=$1
+        shift
+        ;;
+    esac
+  done
 
-    # trim newlines, then add newline at the end
-    help_text=$(sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$help_text")
+  # trim newlines, then add newline at the end
+  help_text=$(sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$help_text")
 
 }
 
 function string::trim_whitespace {
-    local str
-    local mode='both'  # [both|left|right]
+  local str
+  local mode='both' # [both|left|right]
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -m | --mode)
-                mode=$2
-                shift 2
-                ;;
-            *)
-                str=$1
-                shift
-                ;;
-        esac
-    done
-
-    case "$mode" in
-        both)
-            echo "$str" | sed -e
-            ;;
-        left)
-            echo "$str" | sed -e 's/^[[:space:]]*//'
-            ;;
-        right)
-            echo "$str" | sed -e 's/[[:space:]]*$//'
-            ;;
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -m | --mode)
+        mode=$2
+        shift 2
+        ;;
+      *)
+        str=$1
+        shift
+        ;;
     esac
+  done
+
+  case "$mode" in
+    both)
+      echo "$str" | sed -e
+      ;;
+    left)
+      echo "$str" | sed -e 's/^[[:space:]]*//'
+      ;;
+    right)
+      echo "$str" | sed -e 's/[[:space:]]*$//'
+      ;;
+  esac
 }
 
 function get_gh_file_url {
-    local fullname
-    local path
-    local owner
-    local type='raw' # [raw|blob]
+  local fullname
+  local path
+  local owner
+  local type='raw' # [raw|blob]
 
-    local branch
+  local branch
 
-    show_help() {
-        cat << 'EOF'
+  show_help() {
+    cat << 'EOF'
 Usage: 
  - get_gh_file -r <FULLNAME> -p <PATH>
  - get_gh_file -o <OWNER> -n <NAME> -p <PATH>
@@ -298,79 +298,79 @@ Other options:
 
 EOF
 
-    }
+  }
 
-    # if no args, show help
-    if [[ $# -eq 0 ]]; then
+  # if no args, show help
+  if [[ $# -eq 0 ]]; then
+    show_help
+    return 1
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help)
         show_help
-        return 1
-    fi
+        return 0
+        ;;
+      -r | --repo-fullname)
+        fullname=$2
+        shift 2
+        ;;
+      -n | --name)
+        name=$2
+        shift 2
+        ;;
+      -p | --path)
+        path=$2
+        shift 2
+        ;;
+      -o | --owner)
+        owner=$2
+        shift 2
+        ;;
+      -b | --branch)
+        branch=$2
+        shift 2
+        ;;
+      --blob)
+        type='blob'
+        ;;
+      *)
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -h | --help)
-                show_help
-                return 0
-                ;;
-            -r | --repo-fullname)
-                fullname=$2
-                shift 2
-                ;;
-            -n | --name)
-                name=$2
-                shift 2
-                ;;
-            -p | --path)
-                path=$2
-                shift 2
-                ;;
-            -o | --owner)
-                owner=$2
-                shift 2
-                ;;
-            -b | --branch)
-                branch=$2
-                shift 2
-                ;;
-            --blob)
-                type='blob'
-                ;;
-            *)
+        if [[ $(grep -o '/' <<< "$1" | wc -l) -eq 2 ]]; then
+          owner=$(cut -d'/' -f1 <<< "$1")
+          name=$(cut -d'/' -f2 <<< "$1")
+          path=$(cut -d'/' -f3 <<< "$1")
+          fullname="${owner}/${name}"
+        fi
+        shift 1
+        ;;
+    esac
+  done
+  # if $fullname, determine $owner and $name
+  if [[ ! -z $fullname ]]; then
+    IFS='/' read -r -a arr <<< "$fullname"
+    owner=${arr[0]}
+    name=${arr[1]}
+  fi
+  # if not $fullname, and ($owner and $name) are provided, then interpolate $fullname
+  if [[ -z $fullname ]] && [[ ! -z $owner ]] && [[ ! -z $name ]]; then
+    fullname="${owner}/${name}"
+  fi
 
-                if [[ $(grep -o '/' <<< "$1" | wc -l) -eq 2 ]]; then
-                    owner=$(cut -d'/' -f1 <<< "$1")
-                    name=$(cut -d'/' -f2 <<< "$1")
-                    path=$(cut -d'/' -f3 <<< "$1")
-                    fullname="${owner}/${name}"
-                fi
-                shift 1
-                ;;
-        esac
-    done
-    # if $fullname, determine $owner and $name
-    if [[ ! -z $fullname ]]; then
-        IFS='/' read -r -a arr <<< "$fullname"
-        owner=${arr[0]}
-        name=${arr[1]}
-    fi
-    # if not $fullname, and ($owner and $name) are provided, then interpolate $fullname
-    if [[ -z $fullname ]] && [[ ! -z $owner ]] && [[ ! -z $name ]]; then
-        fullname="${owner}/${name}"
-    fi
+  # if not $branch, use '-'
+  [[ -z $branch ]] && branch='-'
 
-    # if not $branch, use '-'
-    [[ -z $branch ]] && branch='-'
+  # ensure path is provided
+  if [[ -z $path ]]; then
+    echo "Path is required"
+    return 1
+  fi
 
-    # ensure path is provided
-    if [[ -z $path ]]; then
-        echo "Path is required"
-        return 1
-    fi
-
-    local raw_url="https://sourcegraph.com/github.com/${fullname}/${branch}/${type}/${path}"
-    echo "$raw_url"
+  local raw_url="https://sourcegraph.com/github.com/${fullname}/${branch}/${type}/${path}"
+  echo "$raw_url"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    get_gh_file "$@"
+  get_gh_file "$@"
 fi

@@ -27,28 +27,28 @@
 
 . /etc/lsb-release
 while true; do
-    case "$1" in
-        --release)
-            DISTRIB_CODENAME="$2"
-            shift 2
-            ;;
-        *)
-            break
-            ;;
-    esac
+  case "$1" in
+    --release)
+      DISTRIB_CODENAME="$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
 done
 PAGE=$(echo "$@" | awk '{print $NF}')
 MAN_ARGS=$(echo "$@" | sed "s/$PAGE$//")
 
 # Mirror support of man's languages
 if [ ! -z "$LANG" ]; then
-    LOCALE="$LANG"
+  LOCALE="$LANG"
 fi
 if [ ! -z "$LC_MESSAGES" ]; then
-    LOCALE="$LC_MESSAGES"
+  LOCALE="$LC_MESSAGES"
 fi
 if echo $LOCALE | grep -q "^en"; then
-    LOCALE=""
+  LOCALE=""
 fi
 
 URL="http://manpages.ubuntu.com/manpages.gz/"
@@ -56,9 +56,9 @@ URL="http://manpages.ubuntu.com/manpages.gz/"
 mandir=$(mktemp -d dman.XXXXXX)
 trap "rm -rf $mandir" EXIT HUP INT QUIT TERM
 for i in $(seq 1 9); do
-    man="$mandir/$i"
-    if wget -O "$man" "$URL/$DISTRIB_CODENAME/$LOCALE/man$i/$PAGE.$i.gz" 2> /dev/null; then
-        man $MAN_ARGS -l "$man" || true
-    fi
-    rm -f "$man"
+  man="$mandir/$i"
+  if wget -O "$man" "$URL/$DISTRIB_CODENAME/$LOCALE/man$i/$PAGE.$i.gz" 2> /dev/null; then
+    man $MAN_ARGS -l "$man" || true
+  fi
+  rm -f "$man"
 done

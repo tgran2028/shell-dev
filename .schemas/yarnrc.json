@@ -50,7 +50,14 @@
       "items": {
         "type": "string"
       },
-      "default": ["master", "origin/master", "upstream/master", "main", "origin/main", "upstream/main"]
+      "default": [
+        "master",
+        "origin/master",
+        "upstream/master",
+        "main",
+        "origin/main",
+        "upstream/main"
+      ]
     },
     "changesetIgnorePatterns": {
       "_package": "@yarnpkg/plugin-git",
@@ -379,13 +386,17 @@
             "type": "string",
             "title": "Match messages whose content is strictly equal to the given text.",
             "description": "In case a message matches both `code`-based and `text`-based filters, the `text`-based ones will take precedence over the `code`-based ones.",
-            "examples": ["lorem-ipsum@npm:1.2.3 lists build scripts, but its build has been explicitly disabled through configuration"]
+            "examples": [
+              "lorem-ipsum@npm:1.2.3 lists build scripts, but its build has been explicitly disabled through configuration"
+            ]
           },
           "pattern": {
             "type": "string",
             "title": "Match messages whose content match the given glob pattern.",
             "description": "In case a message matches both `pattern`-based and `code`-based filters, the `pattern`-based ones will take precedence over the other ones. Patterns can be overridden on a case-by-case basis by using the `text` filter, which has precedence over `pattern`.",
-            "examples": ["lorem-ipsum@* lists build scripts, but its build has been explicitly disabled through configuration"]
+            "examples": [
+              "lorem-ipsum@* lists build scripts, but its build has been explicitly disabled through configuration"
+            ]
           },
           "level": {
             "type": "string",

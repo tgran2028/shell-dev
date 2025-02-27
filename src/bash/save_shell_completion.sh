@@ -13,24 +13,24 @@ SHELL_COMPLETION_DIRS["fish"]="$HOME/.config/fish/completions"
 # Output:
 # stdout - filename
 function get_file_name {
-    local cmd=$1
-    local shell=$2
+  local cmd=$1
+  local shell=$2
 
-    case $shell in
-        zsh)
-            echo "_$cmd"
-            ;;
-        bash)
-            echo "$cmd"
-            ;;
-        fish)
-            echo "$cmd.fish"
-            ;;
-        *)
-            echo "Unknown shell"
-            exit 1
-            ;;
-    esac
+  case $shell in
+    zsh)
+      echo "_$cmd"
+      ;;
+    bash)
+      echo "$cmd"
+      ;;
+    fish)
+      echo "$cmd.fish"
+      ;;
+    *)
+      echo "Unknown shell"
+      exit 1
+      ;;
+  esac
 }
 
 # function display_help {

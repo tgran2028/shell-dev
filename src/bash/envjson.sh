@@ -2,9 +2,9 @@
 
 __env_json() {
   local -a _args
-  # set yq args 
+  # set yq args
   if [[ $# -gt 0 ]]; then
-    _args=( "$@" )
+    _args=("$@")
   else
     _args=(
       '--output-format' 'json'
@@ -12,7 +12,7 @@ __env_json() {
       '-M'
       '--indent' 2
       '.env'
-      )
+    )
   fi
   # dump env to json
   python3 -c '
@@ -34,4 +34,3 @@ sys.stdout.write(
 if [[ ${BASH_SOURCE[0]} == "${0}" ]]; then
   __env_json "$@"
 fi
-

@@ -1,35 +1,32 @@
 {
-	"folders": [
-		{
-			"path": "..",
-			"name": "shell"
-		},
-		{
-			"path": "../../.zsh",
-			"name": "zsh",
-			
-		},
-		{
-			"path": "../../.dotfiles",
-			"name": "dotfiles"
-		}
-	],
-	"settings": {
-		"[shellscript]": {
-			"files.eol": "\n"
-		},
-		"files.enableTrash": true,
-		"files.autoSaveWhenNoErrors": true,
-		"files.defaultLanguage": "shellscript",
-		"files.readonlyInclude": {
-			"/usr/**":true,
-			"/etc/**":true,
-			
-		},
-		"files.exclude": {
-			"**/*zsh_history*/**":true,
-			"**/*zcompdump*/**":true
-		}
-	}
-
+  "folders": [
+    {
+      "path": "..",
+      "name": "shell"
+    },
+    {
+      "path": "../../.zsh",
+      "name": "zsh"
+    },
+    {
+      "path": "../../.dotfiles",
+      "name": "dotfiles"
+    }
+  ],
+  "settings": {
+    "[shellscript]": {
+      "files.eol": "\n"
+    },
+    "files.enableTrash": true,
+    "files.autoSaveWhenNoErrors": true,
+    "files.defaultLanguage": "shellscript",
+    "files.readonlyInclude": {
+      "/usr/**": true,
+      "/etc/**": true
+    },
+    "files.exclude": {
+      "**/*zsh_history*/**": true,
+      "**/*zcompdump*/**": true
+    }
+  }
 }

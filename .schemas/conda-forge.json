@@ -27,11 +27,7 @@
             },
             {
               "items": {
-                "enum": [
-                  "apt",
-                  "cache",
-                  "docker"
-                ],
+                "enum": ["apt", "cache", "docker"],
                 "type": "string"
               },
               "type": "array"
@@ -340,10 +336,7 @@
       "type": "object"
     },
     "BotConfigAutoMergeChoice": {
-      "enum": [
-        "version",
-        "migration"
-      ],
+      "enum": ["version", "migration"],
       "title": "BotConfigAutoMergeChoice",
       "type": "string"
     },
@@ -461,11 +454,7 @@
       "type": "string"
     },
     "ChannelPriorityConfig": {
-      "enum": [
-        "strict",
-        "flexible",
-        "disabled"
-      ],
+      "enum": ["strict", "flexible", "disabled"],
       "title": "ChannelPriorityConfig",
       "type": "string"
     },
@@ -475,13 +464,7 @@
         "pkg_format": {
           "anyOf": [
             {
-              "enum": [
-                "tar",
-                1,
-                2,
-                "1",
-                "2"
-              ]
+              "enum": ["tar", 1, 2, "1", "2"]
             },
             {
               "type": "null"
@@ -585,11 +568,7 @@
       "type": "object"
     },
     "DefaultTestPlatforms": {
-      "enum": [
-        "all",
-        "native",
-        "native_and_emulated"
-      ],
+      "enum": ["all", "native", "native_and_emulated"],
       "title": "DefaultTestPlatforms",
       "type": "string"
     },
@@ -632,11 +611,7 @@
             },
             {
               "items": {
-                "enum": [
-                  "apt",
-                  "cache",
-                  "docker"
-                ],
+                "enum": ["apt", "cache", "docker"],
                 "type": "string"
               },
               "type": "array"
@@ -826,9 +801,7 @@
     },
     "Nullable": {
       "description": "Created to avoid issue with schema validation of null values in lists or dicts.",
-      "enum": [
-        null
-      ],
+      "enum": [null],
       "title": "Nullable"
     },
     "Platforms": {
@@ -1077,12 +1050,7 @@
         "linux_32": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1095,12 +1063,7 @@
         "linux_64": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1113,12 +1076,7 @@
         "linux_aarch64": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1131,12 +1089,7 @@
         "linux_armv6l": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1149,12 +1102,7 @@
         "linux_armv7l": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1167,12 +1115,7 @@
         "linux_ppc64": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1185,12 +1128,7 @@
         "linux_ppc64le": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1203,12 +1141,7 @@
         "linux_riscv64": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1221,12 +1154,7 @@
         "linux_s390x": {
           "anyOf": [
             {
-              "enum": [
-                "cos7",
-                "alma8",
-                "alma9",
-                "ubi8"
-              ],
+              "enum": ["cos7", "alma8", "alma9", "ubi8"],
               "type": "string"
             },
             {
@@ -1799,12 +1727,7 @@
     "conda_install_tool": {
       "anyOf": [
         {
-          "enum": [
-            "conda",
-            "mamba",
-            "micromamba",
-            "pixi"
-          ],
+          "enum": ["conda", "mamba", "micromamba", "pixi"],
           "type": "string"
         },
         {
@@ -1831,10 +1754,7 @@
     "conda_solver": {
       "anyOf": [
         {
-          "enum": [
-            "libmamba",
-            "classic"
-          ],
+          "enum": ["libmamba", "classic"],
           "type": "string"
         },
         {

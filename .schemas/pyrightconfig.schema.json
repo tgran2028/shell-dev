@@ -12,12 +12,7 @@
         },
         {
           "type": "string",
-          "enum": [
-            "none",
-            "information",
-            "warning",
-            "error"
-          ]
+          "enum": ["none", "information", "warning", "error"]
         }
       ]
     },
@@ -35,18 +30,14 @@
       "type": "string",
       "title": "Python version to assume during type analysis",
       "default": "",
-      "examples": [
-        "3.7"
-      ],
+      "examples": ["3.7"],
       "pattern": "^3\\.[0-9]+$"
     },
     "pythonPlatform": {
       "type": "string",
       "title": "Python platform to assume during type analysis",
       "default": "",
-      "examples": [
-        "Linux"
-      ],
+      "examples": ["Linux"],
       "pattern": "^(Linux|Windows|Darwin|All)$"
     },
     "disableBytesTypePromotions": {
@@ -550,21 +541,15 @@
     "defineConstant": {
       "type": "object",
       "title": "Identifiers that should be treated as constants",
-      "properties": {
-      },
+      "properties": {},
       "additionalProperties": {
-          "type": ["string", "boolean"],
-          "title": "Value of constant (boolean or string)"
+        "type": ["string", "boolean"],
+        "title": "Value of constant (boolean or string)"
       }
     },
     "typeCheckingMode": {
       "type": "string",
-      "enum": [
-        "off",
-        "basic",
-        "standard",
-        "strict"
-      ],
+      "enum": ["off", "basic", "standard", "strict"],
       "title": "Specifies the default rule set to use for type checking",
       "default": "standard"
     },
@@ -583,9 +568,7 @@
       "type": "string",
       "title": "Path to directory containing custom type stub files",
       "default": "./typings",
-      "examples": [
-        "src/typestubs"
-      ],
+      "examples": ["src/typestubs"],
       "pattern": "^(.*)$"
     },
     "disableBytesTypePromotions": {
@@ -880,9 +863,7 @@
       "type": "string",
       "title": "Name of virtual environment subdirectory within venvPath",
       "default": "",
-      "examples": [
-        "python37"
-      ],
+      "examples": ["python37"],
       "pattern": "^(.*)$"
     },
     "verboseOutput": {
@@ -896,9 +877,7 @@
       "items": {
         "type": "object",
         "title": "Analysis settings to use for specified subdirectories of code",
-        "required": [
-          "root"
-        ],
+        "required": ["root"],
         "properties": {
           "root": {
             "type": "string",

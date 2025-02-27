@@ -12,8 +12,7 @@ declare OPT_RESOLVE_PATH_FLAG=true
 declare OPT_OUTFILE_PATH
 declare -l OUTFILE_EXT
 
-
-__debug_opts(){
+__debug_opts() {
   cat << EOF
 OPT_DELIMITER: $OPT_DELIMITER
 OPT_OUTPUT_FORMAT: $OPT_OUTPUT_FORMAT
@@ -95,7 +94,7 @@ process_path_item() {
     elif [[ $OPT_RESOLOVE_TYPE == "logical" ]]; then
       realpath "$p"
     fi
-  else 
+  else
     echo "$p"
   fi
 
@@ -245,7 +244,6 @@ deduplicate_path() {
   # create input_path_array
   IFS="$OPT_DELIMITER" read -r -a input_path_array <<< "$input_path"
 
-
   ######################################################
   #        PROCESS EACH PATH TO OUTPUT ARRAY           #
   ######################################################
@@ -262,12 +260,11 @@ deduplicate_path() {
   #   [[ $? -eq 1 ]] && continue
   #   # echo "$p | $clean_p"
 
-
   #   # Append unique, non-visited paths.
-    # if [[ -z "${seen[$clean_p]}" ]]; then
-    #   output_path_array+=("$clean_p")
-    #   seen[$clean_p]=1
-    # fi
+  # if [[ -z "${seen[$clean_p]}" ]]; then
+  #   output_path_array+=("$clean_p")
+  #   seen[$clean_p]=1
+  # fi
 
   #   # check if in seen array
   #   for s in "${seen[@]}"; do
@@ -279,21 +276,21 @@ deduplicate_path() {
   #   # add to seen array
   #   seen+=("$clean_p")
   #   output_path_array+=("$clean_p")
-  
+
   # done
 
   declare -a seen=()
   for p in "${input_path_array[@]}"; do
     clean_p="$(process_path_item "$p")"
     [[ $? -ne 0 || -z "$clean_p" ]] && echo "failed '$p' to '$clean_p'" && continue
-    if echo "${seen[@]}" | tr ' ' '\n' | sort -u | grep -q "$clean_p" >/dev/null 2>&1; then
+    if echo "${seen[@]}" | tr ' ' '\n' | sort -u | grep -q "$clean_p" > /dev/null 2>&1; then
       echo "Duplicate path: $clean_p"
       continue
     fi
     seen+=("$clean_p")
     output_path_array+=("$clean_p")
   done
-  
+
   # ######################################################
   # #                   OUTPUT PATH                      #
   # ######################################################
@@ -305,73 +302,71 @@ deduplicate_path() {
 
   echo "$output_path" | tr "$OPT_DELIMITER" '\n'
 }
-  # ######################################################
-  # #                FORMAT OUTPUT (path or array)       #
-  # ######################################################
+# ######################################################
+# #                FORMAT OUTPUT (path or array)       #
+# ######################################################
 
-  # case "$OPT_OUTPUT_FORMAT" in
-  #   string)
-  #     output="$output_path"
-  #     OUTFILE_EXT='.txt'
-  #     ;;
-  #   json)
-  #     # write output by convert output_path_array to json using jq
-  #     output="$(
-  #       IFS="$OPT_DELIMITER"
-  #       echo "${output_path_array[*]}" | jq -R -M -s 'split(":")'
-  #     )"
-  #     OUTFILE_EXT='.json'
-  #     [[ "$OPT_COLORIZE_OUTPUT" == true ]] && output="$(echo "$output" | jq -M | bat -l json -P --plain -f)"
-  #     ;;
-  #   yaml)
-  #     # use yq
-  #     output="$(
-  #       IFS="$OPT_DELIMITER"
-  #       echo "${output_path_array[*]}" | jq -R -M -s 'split(":")' | yq -p j -o y
-  #     )"
-  #     [[ "$OPT_COLORIZE_OUTPUT" == true ]] && output="$(echo "$output" | bat -l yaml -P --plain -f)"
-  #     OUTFILE_EXT='.yaml'
-  #     ;;
-  #   list)
-  #     # write as multiline array, one element per line
-  #     output="$(
-  #       IFS="$OPT_DELIMITER"
-  #       echo "${output_path_array[*]}"
-  #     )"
-  #     OUTFILE_EXT='.list'
-  #     ;;
-  #   *)
-  #     echo "Invalid format. Must be one of [string, json, yaml, list]"
-  #     return 1
-  #     ;;
-  # esac
+# case "$OPT_OUTPUT_FORMAT" in
+#   string)
+#     output="$output_path"
+#     OUTFILE_EXT='.txt'
+#     ;;
+#   json)
+#     # write output by convert output_path_array to json using jq
+#     output="$(
+#       IFS="$OPT_DELIMITER"
+#       echo "${output_path_array[*]}" | jq -R -M -s 'split(":")'
+#     )"
+#     OUTFILE_EXT='.json'
+#     [[ "$OPT_COLORIZE_OUTPUT" == true ]] && output="$(echo "$output" | jq -M | bat -l json -P --plain -f)"
+#     ;;
+#   yaml)
+#     # use yq
+#     output="$(
+#       IFS="$OPT_DELIMITER"
+#       echo "${output_path_array[*]}" | jq -R -M -s 'split(":")' | yq -p j -o y
+#     )"
+#     [[ "$OPT_COLORIZE_OUTPUT" == true ]] && output="$(echo "$output" | bat -l yaml -P --plain -f)"
+#     OUTFILE_EXT='.yaml'
+#     ;;
+#   list)
+#     # write as multiline array, one element per line
+#     output="$(
+#       IFS="$OPT_DELIMITER"
+#       echo "${output_path_array[*]}"
+#     )"
+#     OUTFILE_EXT='.list'
+#     ;;
+#   *)
+#     echo "Invalid format. Must be one of [string, json, yaml, list]"
+#     return 1
+#     ;;
+# esac
 
+# ######################################################
+# #                WRITE OUTPUT TO FILE (if selected)  #
+# ######################################################
 
+# # [[ -z "$OPT_OUTFILE_PATH" ]] && echo "no valid output" && exit 1
+# if [[ -n "$OPT_OUTFILE_PATH" ]]; then
+#   local outfile_stem outfile_dir outfile_abs
 
-  # ######################################################
-  # #                WRITE OUTPUT TO FILE (if selected)  #
-  # ######################################################
+#   # file stem from outfile (fixed substitution syntax)
+#   outfile_stem="$(basename "${OPT_OUTFILE_PATH//$OUTFILE_EXT/}")"
+#   # parent directory of outfile
+#   outfile_dir="$(dirname "$OPT_OUTFILE_PATH")"
+#   # absolute path of outfile
+#   outfile_abs="${outfile_dir}/${outfile_stem}${OUTFILE_EXT}"
 
-  # # [[ -z "$OPT_OUTFILE_PATH" ]] && echo "no valid output" && exit 1
-  # if [[ -n "$OPT_OUTFILE_PATH" ]]; then
-  #   local outfile_stem outfile_dir outfile_abs
+#   if [[ ! -d "$outfile_dir" ]]; then
+#     mkdir -p "$outfile_dir"
+#   fi
 
-  #   # file stem from outfile (fixed substitution syntax)
-  #   outfile_stem="$(basename "${OPT_OUTFILE_PATH//$OUTFILE_EXT/}")"
-  #   # parent directory of outfile
-  #   outfile_dir="$(dirname "$OPT_OUTFILE_PATH")"
-  #   # absolute path of outfile
-  #   outfile_abs="${outfile_dir}/${outfile_stem}${OUTFILE_EXT}"
+#   echo "$output" | tee "$outfile_abs" > /dev/null
 
-  #   if [[ ! -d "$outfile_dir" ]]; then
-  #     mkdir -p "$outfile_dir"
-  #   fi
-
-  #   echo "$output" | tee "$outfile_abs" > /dev/null
-
-  # else
-  #   echo "$output"
-  # fi
+# else
+#   echo "$output"
+# fi
 # }
 
 # ensure file not being sourced

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-
-declare -a shells=( '/usr/bin/zsh' '/usr/bin/bash' '/usr/bin/fish' )
-declare -a methods=( 'source', 'execute' )
+declare -a shells=('/usr/bin/zsh' '/usr/bin/bash' '/usr/bin/fish')
+declare -a methods=('source', 'execute')
 
 _eof='EOF'
 
@@ -35,16 +34,14 @@ EOF
 chmod +x "$tf"
 
 for __SHELL in "${shells[@]}"; do
-    for __METHOD in "${methods[@]}"; do
-        export SHELL_NAME=$(echo "$__SHELL" | awk -F'/' '{print $NF}')
-        export METHOD_NAME=$__METHOD
+  for __METHOD in "${methods[@]}"; do
+    export SHELL_NAME=$(echo "$__SHELL" | awk -F'/' '{print $NF}')
+    export METHOD_NAME=$__METHOD
 
-        if [[ $__METHOD == 'source' ]]; then
-            exec "$__SHELL" -c ". $tf"
-        elif [[ $__METHOD == 'execute' ]]; then
-           exec "$__SHELL" -c "$tf '$SHELL_NAME' $METHOD_NAME"
-        fi 
-    done
+    if [[ $__METHOD == 'source' ]]; then
+      exec "$__SHELL" -c ". $tf"
+    elif [[ $__METHOD == 'execute' ]]; then
+      exec "$__SHELL" -c "$tf '$SHELL_NAME' $METHOD_NAME"
+    fi
+  done
 done
-
-

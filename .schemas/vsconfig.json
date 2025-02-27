@@ -24,9 +24,7 @@
       }
     }
   },
-  "required": [
-    "components"
-  ],
+  "required": ["components"],
   "title": "JSON schema for Visual Studio component configuration files",
   "type": "object"
 }

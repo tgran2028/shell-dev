@@ -5,12 +5,7 @@
     "RuleType": {
       "title": "RuleType",
       "description": "An enumeration.",
-      "enum": [
-        "refactoring",
-        "suggestion",
-        "comment",
-        "hover"
-      ]
+      "enum": ["refactoring", "suggestion", "comment", "hover"]
     },
     "PythonVersion": {
       "title": "PythonVersion",
@@ -25,10 +20,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "major",
-        "minor"
-      ]
+      "required": ["major", "minor"]
     },
     "RuleSettingsConfig": {
       "title": "RuleSettingsConfig",
@@ -36,9 +28,7 @@
       "properties": {
         "enable": {
           "title": "Enable",
-          "default": [
-            "default"
-          ],
+          "default": ["default"],
           "type": "array",
           "items": {
             "type": "string"
@@ -54,11 +44,7 @@
           }
         },
         "rule_types": {
-          "default": [
-            "refactoring",
-            "suggestion",
-            "comment"
-          ],
+          "default": ["refactoring", "suggestion", "comment"],
           "type": "array",
           "items": {
             "$ref": "#/definitions/RuleType"
@@ -82,12 +68,7 @@
     "RuleLanguage": {
       "title": "RuleLanguage",
       "description": "An enumeration.",
-      "enum": [
-        "python",
-        "java",
-        "javascript",
-        "typescript"
-      ],
+      "enum": ["python", "java", "javascript", "typescript"],
       "type": "string"
     },
     "PathsConfig": {
@@ -124,9 +105,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "match"
-      ],
+      "required": ["match"],
       "additionalProperties": false
     },
     "NoMatchRuleTestConfig": {
@@ -138,9 +117,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "no-match"
-      ],
+      "required": ["no-match"],
       "additionalProperties": false
     },
     "RuleConfig": {
@@ -210,11 +187,7 @@
           }
         }
       },
-      "required": [
-        "id",
-        "description",
-        "pattern"
-      ],
+      "required": ["id", "description", "pattern"],
       "additionalProperties": false
     },
     "MetricsConfig": {
@@ -260,9 +233,7 @@
         },
         "ignore_labels": {
           "title": "Ignore Labels",
-          "default": [
-            "sourcery-ignore"
-          ],
+          "default": ["sourcery-ignore"],
           "type": "array",
           "items": {
             "type": "string"
@@ -354,17 +325,11 @@
     "rule_settings": {
       "title": "Rule Settings",
       "default": {
-        "enable": [
-          "default"
-        ],
+        "enable": ["default"],
         "disable": [],
         "include": [],
         "skip": [],
-        "rule_types": [
-          "refactoring",
-          "suggestion",
-          "comment"
-        ],
+        "rule_types": ["refactoring", "suggestion", "comment"],
         "python_version": null,
         "allow_adding_imports": false
       },
@@ -410,9 +375,7 @@
       "title": "Github",
       "default": {
         "labels": [],
-        "ignore_labels": [
-          "sourcery-ignore"
-        ],
+        "ignore_labels": ["sourcery-ignore"],
         "review_or_request_review": "author",
         "sourcery_branch": "sourcery-dev/{base_branch}"
       },
