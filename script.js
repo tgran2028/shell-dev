@@ -45,19 +45,13 @@ prettier.resolveConfig(process.cwd()).then((options) => {
 });
 
 
-// Get prettier support info
-async function getPrettierSupportInfo(opts) {
-  try {
-    const info = await prettier.getSupportInfo(opts);
-    return info;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
+function resolvePromise(promise) {
+  return promise
+    .then((data) => [null, data])
+    .catch((err) => [err]);
+};
 
-let supportInfo = await getPrettierSupportInfo(prettierOptions);
-console.log(supportInfo);
 
+let info = resolvePromise(prettier.getSupportInfo(prettierOptions));
 
 

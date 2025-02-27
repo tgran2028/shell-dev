@@ -50,3 +50,7 @@ const prettierOptions = {
 prettier.resolveConfig(process.cwd()).then((options) => {
   Object.assign(prettierOptions, options);
 });
+
+#!javascript
+
+const fs = require('fs');
