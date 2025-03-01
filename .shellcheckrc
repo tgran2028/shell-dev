@@ -9,7 +9,7 @@ enable=all
 #
 # Check ID          Symbolic name                   Type
 # SC2250            require-variable-braces         optional
-disable=SC2250
+disable=SC2250,SC2312
 
 # Add the script directory to the search path for source statements
 source-path=SCRIPTDIR

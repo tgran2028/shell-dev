@@ -4,14 +4,11 @@ index_path=~/.cache/pypi.simple-index.json
 
 save_index() {
 
-  curl -fsSL 'https://pypi.org/simple/' | htmlq a -t \
-    | {
+  curl -fsSL 'https://pypi.org/simple/' | htmlq a -t | {
       # remove leading/trailing whitespace
       sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
-        |
         # remove empty lines
         grep -v '^$' \
-        |
         # unique
         sort -u \
         |
@@ -20,9 +17,7 @@ save_index() {
           --arg timestamp "$(date +%s)" \
           --arg host 'pypi.org' \
           '{host: $host, last_update: $timestamp | tonumber, packages: split("\n") | map(select(length > 0))}' \
-        |
-        # output
-        tee "$index_path" > /dev/null
+        | tee "$index_path" > /dev/null
     }
 
 }

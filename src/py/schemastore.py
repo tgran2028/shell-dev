@@ -6,8 +6,8 @@ import json
 import time
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Optional
-
+from typing import Any, Optional, cast, Type, TypeAlias
+import re
 import click
 import platformdirs
 import requests
@@ -22,6 +22,9 @@ from thefuzz import fuzz
 from typing import Annotated
 
 CATALOG_URL: str = "https://www.schemastore.org/api/json/catalog.json"
+
+
+SchemaStoreRecord: TypeAlias = dict[str, str | None | list[str] | dict[str, str]]
 
 
 def get_cache_dir() -> Path:
@@ -130,9 +133,20 @@ class Schema(BaseModel):
     url: HttpUrl
     versions: dict[str, HttpUrl] = Field(default_factory=dict)
 
+    class Config:
+        allow_mutation = False
+
     @property
     def url_filename(self) -> str:
         return Path(str(self.url)).name
+    
+    @property
+    def name_clean(self) -> str:
+        name = self.name.lower().strip()
+        name = re.sub(r"[-\s]{1,}", "_", name)
+        name = re.sub(r"_+", "_", name)
+        name = re.sub(r"[^a-z0-9_]", "", name)
+        return name
 
     @property
     def schema_data(self) -> dict:
@@ -155,9 +169,14 @@ class Schema(BaseModel):
         indent: int = 2,
         default_name: bool = False,
     ) -> Optional[str]:
+        if isinstance(path, str):
+            path = Path(path)
         if not path and default_name:
             path = Path.cwd().joinpath(self.url_filename)
-        if not path and not default_name:
+        if isinstance(path, str):
+            path = Path(path)
+
+        if not path:
             return json.dumps(self.schema_data, indent=indent)
         with open(path, "w") as f:
             json.dump(self.schema_data, f, indent=indent)
@@ -177,7 +196,7 @@ class Schema(BaseModel):
                 sort_keys=False,
                 indent=indent,
             )
-        with open(path, "w") as f:
+        with open(str(path), "w") as f:
             yaml.dump(
                 self.schema_data,
                 f,
@@ -202,9 +221,8 @@ class Schema(BaseModel):
         return f"Schema(name={self.name}, url={self.url})"
 
     def __contains__(self, term: str) -> bool:
-        return (
-            term.lower() in self.name.lower()
-            or term.lower() in self.description.lower()
+        return term.lower() in self.name.lower() or (
+            term.lower() in self.description.lower() if self.description else False
         )
 
     def __eq__(self, other: "Schema") -> bool:
@@ -212,22 +230,28 @@ class Schema(BaseModel):
 
     def __hash__(self) -> int:
         h = hashlib.sha256()
-        h.update(self.url.encode())
+        h.update(str(self.url).encode())
         return int(h.hexdigest(), 16)
 
+    def __getitem__(self, key: str) -> Any:
+        return self.to_dict()[key]
+
+    def __iter__(self):
+        return iter(self.to_dict())
+
     @classmethod
-    def from_dict(cls, data: dict) -> "Schema":
+    def from_dict(cls, data: SchemaStoreRecord) -> "Schema":
         return cls(
             name=data["name"],
             description=data.get("description"),
-            file_match=[str(item) for item in data.get("fileMatch", [])],
+            file_match=[str(item) for item in data.get("fileMatch", [])],  # type: ignore
             url=data["url"],
             versions=data.get("versions", {}),
         )
 
 
 @functools.lru_cache(maxsize=5000)
-def get_schemas(as_obj: bool = True) -> list[dict[str, Any]] | list[Schema]:
+def _get_schemas(as_obj: bool = True) -> SchemaStoreRecord | list[Schema]:
     """
     Get the list of schemas.
 
@@ -242,11 +266,33 @@ def get_schemas(as_obj: bool = True) -> list[dict[str, Any]] | list[Schema]:
     return schemas
 
 
+def get_schemas() -> list[Schema]:
+    """
+    Get the list of schemas.
+
+    Returns:
+        List[Schema]: The list of schemas.
+    """
+    schemas = _get_schemas(as_obj=True)
+    return cast(list[Schema], schemas)
+
+
+def get_schemas_raw() -> SchemaStoreRecord:
+    """
+    Get the list of schemas.
+
+    Returns:
+        List[Dict[str, Any]]: The list of schemas.
+    """
+    schemas = _get_schemas(as_obj=False)
+    return cast(SchemaStoreRecord, schemas)
+
+
 def name_completion(incomplete: str) -> list[str]:
     """
     Click completion function for schema names.
     """
-    schemas = get_schemas(as_obj=False)
+    schemas = get_schemas()
     names = [schema["name"] for schema in schemas]
     names = sorted(list(set(names)))
     return [name for name in names if incomplete.lower() in name.lower()]
@@ -264,8 +310,13 @@ def get_schema(
     Returns:
         Schema: The schema.
     """
-    schemas = get_schemas(as_obj=False)
+    schemas = get_schemas_raw()
     for schema in schemas:
+        try:
+            schema["name"]
+        except KeyError:
+            raise ValueError(f"Schema '{name}' not found.")
+        assert isinstance(schema["name"], str)
         if schema["name"].lower() == name.lower():
             return (
                 schema
@@ -284,11 +335,13 @@ def get_schema(
 
 
 def fuzzy_search(name: str) -> Schema:
-    schemas = get_schemas(as_obj=True)
+    schemas = get_schemas()
+
     schema_names = [s.name for s in schemas]
 
     result = fuzz.partial_token_set_ratio(name, schema_names)
-    return result
+    schema = schemas[result[0]]
+    return schema
 
 
 app = typer.Typer(
@@ -333,7 +386,7 @@ def list_schemas(
     """
     console = get_console()
 
-    schemas = get_schemas(as_obj=True)
+    schemas = get_schemas()
     if names:
         schema_names = sorted([s.name for s in schemas])
         if fmt == OutputFormat.JSON:
@@ -409,9 +462,8 @@ def search_schema(
     if fuzzy:
         result = fuzzy_search(name)
     else:
-        schemas = get_schemas(as_obj=False)
+        schemas = get_schemas_raw()
         result = [s for s in schemas if name.lower() in s["name"].lower()]
-        
 
     if not result:
         typer.Exit(code=1)
@@ -473,9 +525,9 @@ def show_entry(
     """
     console = get_console()
 
-    schema = get_schema(name)
+    schema = get_schema(name, raw=True)
     if fmt == SingleObjectFormat.JSON:
-        data = json.dumps(schema.schema_data, indent=indent)
+        data = json.dumps(schema, indent=indent)
         if raw:
             typer.echo(data)
             return
@@ -484,7 +536,7 @@ def show_entry(
         console.print(s)
     elif fmt == SingleObjectFormat.YAML:
         data = yaml.dump(
-            schema.schema_data, default_flow_style=False, sort_keys=False, indent=indent
+            schema, default_flow_style=False, sort_keys=False, indent=indent
         )
         if raw:
             typer.echo(data)
