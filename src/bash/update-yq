@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# update-yq
+# - - - - - - - - - - - - - - - - - - -
+set -e
+
+tempdir="$(mktemp -d)"
+
+trap 'rm -rf "$tempdir"' EXIT
+
+get_arch() {
+  case $(uname -m) in
+    x86_64) echo "amd64" ;;
+    i*86) echo "386" ;;
+    arm*) echo "arm" ;;
+    aarch64) echo "arm64" ;;
+  esac
+}
+
+get_os() {
+  # try windows:
+  [[ -n $WINDIR ]] && {
+    echo "windows"
+    return
+  }
+  case $(uname -s) in
+    Darwin) echo "darwin" ;;
+    Linux) echo "linux" ;;
+  esac
+}
+
+get_yq_name() {
+  local os arch
+  os=$(get_os)
+  arch=$(get_arch)
+  echo "yq_${os}_${arch}"
+}
+
+get_download_url() {
+  local filename
+  filename=$(get_yq_name)
+  curl -fsSL 'https://api.github.com/repos/mikefarah/yq/releases/latest' |
+    jq -rM --arg stem "$filename" \
+      '.assets.[] | select((.name | test($stem)) and (.name | endswith(".tar.gz") | not)) | .browser_download_url'
+}
+
+main() {
+  local _dl_url
+  local _prefix="${1:-/usr/local}"
+
+  dl_url="$(get_download_url)"
+  echo "$dl_url"
+  curl -fsSL "${dl_url}" -o "${tempdir}/yq" && chmod +x "${tempdir}/yq"
+  if ! "${tempdir}/yq" --version > /dev/null 2>&1; then
+    echo "Failed to install yq"
+    exit 1
+  else
+    if [[ -x "${_prefix}/bin/yq" ]]; then
+      read -p "yq is already installed. Do you want to overwrite it? [y/N] " -r
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo mv "${tempdir}/yq" "${_prefix}/bin/yq"
+      fi
+    else
+      sudo mv "${tempdir}/yq" "${_prefix}/bin/yq"
+    fi
+  fi
+}
+
+if [[ ${BASH_SOURCE[0]} == "${0}" ]]; then
+  main "$@"
+  #get_yq_name "$@"
+  #get_download_url "$@"
+fi
