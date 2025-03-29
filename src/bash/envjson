@@ -20,15 +20,14 @@ import os,sys,json;
 env=dict(os.environ);
 env_json={
   "env": {
-    k: env[k]
+    k: os.environ[k]
     for k in
-    sorted(list(env.keys()))
+    sorted(list(dict(os.environ).keys()))
   }
 };
-sys.stdout.write(
-  f"\n{json.dumps(env_json,indent=2)}\n"
-);
-' | yq -p json "${_args[@]}"
+print(json.dumps(env_json,indent=2),flush=True,file=sys.stdout);
+' 
+# | yq -p json "${_args[@]}"
 }
 
 if [[ ${BASH_SOURCE[0]} == "${0}" ]]; then

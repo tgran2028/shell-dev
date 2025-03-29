@@ -1,0 +1,320 @@
+#!/usr/bin/env python3
+# csv_converter.py
+
+import argparse
+import csv
+import io
+import json
+import re
+import sys
+from typing import Any, Dict, List, Literal, Optional, TextIO, Union
+
+import yaml
+
+
+def read_csv_data(
+    file_or_data: Optional[str], parse_values: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Read CSV data either from a file path or directly from a string.
+
+    Args:
+        file_or_data: Path to the CSV file or CSV data as a string
+        parse_values: Whether to parse string values into appropriate data types
+
+    Returns:
+        List of dictionaries where each dictionary represents a row in the CSV
+
+    Raises:
+        ValueError: If there's an issue reading or parsing the CSV
+    """
+    # Check if we're reading from stdin
+    if file_or_data is None:
+        return read_csv_from_stream(sys.stdin, parse_values)
+
+    # Try to open as a file first
+    try:
+        with open(file_or_data, "r", newline="", encoding="utf-8") as csvfile:
+            return read_csv_from_stream(csvfile, parse_values)
+    except (FileNotFoundError, PermissionError, IsADirectoryError):
+        # If it's not a valid file, treat it as CSV data
+        try:
+            return read_csv_from_string(file_or_data, parse_values)
+        except csv.Error as e:
+            raise ValueError(f"Error parsing CSV data: {e}")
+
+
+def read_csv_from_stream(
+    stream: TextIO, parse_values: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Read CSV data from a text stream.
+
+    Args:
+        stream: Text stream containing CSV data
+        parse_values: Whether to parse string values into appropriate data types
+
+    Returns:
+        List of dictionaries where each dictionary represents a row in the CSV
+
+    Raises:
+        csv.Error: If there's an issue parsing the CSV
+    """
+    reader = csv.DictReader(stream)
+    if parse_values:
+        return [parse_row_values(row) for row in reader]
+    else:
+        return [row for row in reader]
+
+
+def read_csv_from_string(
+    csv_data: str, parse_values: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Read CSV data from a string.
+
+    Args:
+        csv_data: CSV data as a string
+        parse_values: Whether to parse string values into appropriate data types
+
+    Returns:
+        List of dictionaries where each dictionary represents a row in the CSV
+
+    Raises:
+        csv.Error: If there's an issue parsing the CSV
+    """
+    with io.StringIO(csv_data) as csvfile:
+        reader = csv.DictReader(csvfile)
+        if parse_values:
+            return [parse_row_values(row) for row in reader]
+        else:
+            return [row for row in reader]
+
+
+def parse_value(value: str) -> Any:
+    """
+    Parse a string value into its appropriate data type.
+
+    Args:
+        value: String value to parse
+
+    Returns:
+        Parsed value with appropriate data type
+    """
+    # Handle empty strings as null
+    if value == "":
+        return None
+
+    # Handle null/None values
+    if value.lower() in ["null", "none"]:
+        return None
+
+    # Handle boolean values
+    if value.lower() == "true":
+        return True
+    if value.lower() == "false":
+        return False
+
+    # Handle numeric values
+    try:
+        # Check if it's an integer
+        if re.match(r"^-?\d+$", value):
+            return int(value)
+
+        # Check if it's a float
+        if re.match(r"^-?\d+\.\d+$", value):
+            return float(value)
+    except (ValueError, TypeError):
+        pass
+
+    # Return as string if no other type matches
+    return value
+
+
+def parse_row_values(row: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Parse all values in a row to their appropriate data types.
+
+    Args:
+        row: Dictionary representing a CSV row with string values
+
+    Returns:
+        Dictionary with values converted to appropriate data types
+    """
+    return {key: parse_value(value) for key, value in row.items()}
+
+
+def apply_title_if_needed(
+    data: List[Dict[str, Any]], title: Optional[str]
+) -> Union[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]]]:
+    """
+    Wrap data in a titled object if a title is provided.
+
+    Args:
+        data: The CSV data as a list of dictionaries
+        title: Optional title to use as the key for the data
+
+    Returns:
+        Either the original data or a dictionary with the title as key and data as value
+    """
+    if title:
+        return {title: data}
+    return data
+
+
+def convert_to_format(
+    data: Union[List[Dict[str, Any]], Dict[str, List[Dict[str, Any]]]],
+    output_format: str,
+    indent: int,
+) -> str:
+    """
+    Convert data to the specified format.
+
+    Args:
+        data: Data to convert (either a list or a dictionary with title)
+        output_format: Format to convert to ('json' or 'yaml')
+        indent: Number of spaces for indentation
+
+    Returns:
+        String representation of the data in the specified format
+
+    Raises:
+        ValueError: If the output format is not supported
+    """
+    if output_format.lower() == "json":
+        return json.dumps(data, indent=indent)
+    elif output_format.lower() == "yaml":
+        # For YAML, we need to handle indentation differently
+        # PyYAML doesn't have a direct indent parameter like json.dumps
+        # but we can use the default_flow_style=False to get a block style output
+        return yaml.dump(data, sort_keys=False, default_flow_style=False, indent=indent)
+    else:
+        raise ValueError(f"Unsupported output format: {output_format}")
+
+
+def write_to_file_or_stdout(content: str, output_file: Optional[str] = None) -> None:
+    """
+    Write content to a file or stdout.
+
+    Args:
+        content: Content to write
+        output_file: Path to the output file, or None to write to stdout
+
+    Raises:
+        PermissionError: If the file can't be written due to permissions
+    """
+    if output_file:
+        try:
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(content)
+        except PermissionError:
+            raise ValueError(
+                f"Permission denied when trying to write to: {output_file}"
+            )
+    else:
+        print(content)
+
+
+def is_stdin_available() -> bool:
+    """
+    Check if data is being piped to stdin.
+
+    Returns:
+        True if stdin has data, False otherwise
+    """
+    return not sys.stdin.isatty()
+
+
+def main():
+    """
+    Main function to parse arguments and convert CSV to the specified format.
+    """
+    parser = argparse.ArgumentParser(
+        description="Convert a CSV file or data to JSON or YAML format",
+        epilog="""
+Examples:
+  # Convert a CSV file to JSON
+  ./csv_converter.py data.csv
+  
+  # Convert CSV data from stdin to JSON
+  cat data.csv | ./csv_converter.py
+  
+  # Convert to YAML with a title
+  ./csv_converter.py data.csv -f yaml -t "My Data"
+  
+  # Convert with type parsing and custom indentation
+  ./csv_converter.py data.csv -p -i 4 -o output.json
+""",
+    )
+
+    parser.add_argument(
+        "csv_file",
+        help="Path to the CSV file to convert (omit to read from stdin)",
+        nargs="?",
+        default=None,
+    )
+
+    parser.add_argument(
+        "-o", "--output", help="Path to the output file (default: stdout)", default=None
+    )
+
+    parser.add_argument(
+        "-f",
+        "--format",
+        help="Output format: json or yaml (default: json)",
+        choices=["json", "yaml"],
+        default="json",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--title",
+        help="Title to use as the key for the data in the output",
+        default=None,
+    )
+
+    parser.add_argument(
+        "-i",
+        "--indent",
+        help="Number of spaces for indentation (default: 2)",
+        type=int,
+        default=2,
+    )
+
+    parser.add_argument(
+        "-p",
+        "--parse",
+        help="Parse string values into appropriate data types",
+        action="store_true",
+    )
+
+    args = parser.parse_args()
+
+    # Check if we need to read from stdin
+    if args.csv_file is None and not is_stdin_available():
+        parser.print_help()
+        sys.exit(1)
+
+    try:
+        # Read the CSV data from file or stdin
+        data = read_csv_data(args.csv_file, args.parse)
+
+        # Apply title if provided
+        titled_data = apply_title_if_needed(data, args.title)
+
+        # Convert to the specified format with the specified indent
+        formatted_output = convert_to_format(titled_data, args.format, args.indent)
+
+        # Write to file or stdout
+        write_to_file_or_stdout(formatted_output, args.output)
+
+    except ValueError as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
