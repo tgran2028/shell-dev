@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+template=$HOME/.local/bash-nb.template.ipynb
+if [ ! -f "$template" ]; then
+    echo "Template file not found: $template"
+    exit 1
+fi
+
+# copy template to current directory. Rename as bash.ipynb if no arguments. If bash.ipynb exists, append a number to the filename.
+if [ $# -eq 0 ]; then
+    target="bash.ipynb"
+else
+    target="$1"
+fi
+# ensure .ipynb ext on target
+if [[ $target != *.ipynb ]]; then
+    target="$target.ipynb"
+fi
+# check if target exists
+if [ -f "$target" ]; then
+    # append a number to the filename
+    i=1
+    while [ -f "${target%.ipynb}-$i.ipynb" ]; do
+        ((i++))
+    done
+    target="${target%.ipynb}-$i.ipynb"
+fi
+cp "$template" "$target"
+code-insiders "$target"
